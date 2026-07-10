@@ -169,8 +169,35 @@ async function renderView(viewName, query = '') {
     else if (viewName === 'history')   html = buildLibrary('Watch History', state.user.history);
 
     c.innerHTML = html;
+
+    /* ── High-Revenue SPA Ad Lifecycle Management ── */
+    const adWrapper = document.getElementById('homeNativeAdWrapper');
+    if (adWrapper) {
+        if (viewName === 'home') {
+            // 1. Rebuild the visual structural slots fresh
+            adWrapper.innerHTML = `
+                <div class="section-head">
+                    <span class="section-title">Suggested For You</span>
+                </div>
+                <div class="ad-card-wrapper" id="container-5e44b31349514dceb01e5ede3c9eb1a4"></div>
+            `;
+            
+            // 2. Instantiate and mount a fresh script instance to trigger a new impression call
+            const nativeScript = document.createElement('script');
+            nativeScript.async = true;
+            nativeScript.setAttribute('data-cfasync', 'false');
+            nativeScript.src = 'https://pl30305264.effectivecpmnetwork.com/5e44b31349514dceb01e5ede3c9eb1a4/invoke.js';
+            
+            adWrapper.appendChild(nativeScript);
+        } else {
+            // Cleanly wipe the HTML content when leaving the page to free up resources
+            adWrapper.innerHTML = '';
+        }
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 async function buildHome() {
     const [trending, popular, topTv] = await Promise.all([
@@ -271,17 +298,8 @@ async function filterGenre(id, el) {
    PLAYER
 ================================================================ */
 async function playMedia(id, type) {
+    state.currentMedia = { id, type };
     const data = await tmdb(`/${type}/${id}`);
-    
-    // Configures state tracking dynamically based on media type
-    state.currentMedia = { 
-        id, 
-        type, 
-        title: data.title || data.name,
-        season: type === 'tv' ? 1 : null,
-        episode: type === 'tv' ? 1 : null
-    };
-    
     document.getElementById('playerTitle').textContent = data.title || data.name;
 
     const epPanel    = document.getElementById('epPanel');
@@ -305,12 +323,7 @@ async function playMedia(id, type) {
     addToHistory(data, type);
 }
 
-
 async function loadEpisodes(id, season) {
-    if (state.currentMedia) {
-        state.currentMedia.season = parseInt(season);
-    }
-    
     const data = await tmdb(`/tv/${id}/season/${season}`);
     document.getElementById('epList').innerHTML = (data.episodes||[]).map(ep => `
         <div class="ep-item" onclick="playEpisode(${season},${ep.episode_number})">
@@ -320,18 +333,11 @@ async function loadEpisodes(id, season) {
     playEpisode(season, 1);
 }
 
-
 function playEpisode(s, e) {
-    if (state.currentMedia) {
-        state.currentMedia.season = parseInt(s);
-        state.currentMedia.episode = parseInt(e);
-    }
-    
     const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
     document.getElementById('streamFrame').src =
         `${base}/tv?tmdb=${state.currentMedia.id}&season=${s}&episode=${e}`;
 }
-
 
 function loadStream() {
     const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
@@ -418,25 +424,4 @@ function toast(msg) {
     el.classList.add('show');
     clearTimeout(_tt);
     _tt = setTimeout(() => el.classList.remove('show'), 2800);
-}
-async function downloadMedia() {
-    if (!state.currentMedia) return;
-
-    const { title, type, season, episode } = state.currentMedia;
-    toast('Searching direct download directories...');
-
-    // Advanced search targeting open cloud servers hosting raw video files
-    let query = `intitle:"index.of" (mp4|mkv|avi) "${title}"`;
-
-    if (type === 'tv') {
-        // Formats numbers to standard production format (e.g., 1 -> 01)
-        const s = String(season).padStart(2, '0');
-        const e = String(episode).padStart(2, '0');
-        // Targets specific files matching season/episode markers like S01E05
-        query += ` (S${s}E${e} || "S${season} E${episode}")`;
-    }
-
-    // Opens the direct server directories in a new window
-    const downloadUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-    window.open(downloadUrl, '_blank');
 }

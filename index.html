@@ -49,28 +49,26 @@
             <button onclick="openSettings()">⚙ Settings</button>
         </div>
     </header>
-    <div id="viewContainer"></div>
+<!-- Locate this near the center of your index.html -->
+<div id="viewContainer"></div>
+
+<!-- ==========================================
+     HIGH-REVENUE AD TARGET SLOT
+     ========================================== -->
+<div id="homeNativeAdWrapper" class="native-ad-row"></div>
+
 </div>
 
 <!-- ── Player ── -->
 <div id="playerModal">
     <div class="player-head">
         <h2 id="playerTitle">—</h2>
-<!--         <div class="player-controls">
-    <button id="srv1Btn" onclick="setServer(1)">Server 1</button>
-    <button id="srv2Btn" onclick="setServer(2)">Server 2</button>
-    <select id="seasonPick" style="display:none;" onchange="loadEpisodes(state.currentMedia.id, this.value)"></select>
-    <button class="close-btn" onclick="closePlayer()">✕ Close</button>
-</div> -->
-<div class="player-controls">
-    <button id="srv1Btn" onclick="setServer(1)">Server 1</button>
-    <button id="srv2Btn" onclick="setServer(2)">Server 2</button>
-    <button id="downloadBtn" onclick="downloadMedia()">📥 Download</button>
-    
-    <select id="seasonPick" style="display:none;" onchange="loadEpisodes(state.currentMedia.id, this.value)"></select>
-    <button class="close-btn" onclick="closePlayer()">✕ Close</button>
-</div>
-
+        <div class="player-controls">
+            <button id="srv1Btn" onclick="setServer(1)">Server 1</button>
+            <button id="srv2Btn" onclick="setServer(2)">Server 2</button>
+            <select id="seasonPick" style="display:none;" onchange="loadEpisodes(state.currentMedia.id, this.value)"></select>
+            <button class="close-btn" onclick="closePlayer()">✕ Close</button>
+        </div>
     </div>
     <div class="player-body">
         <iframe id="streamFrame" allowfullscreen allow="autoplay; picture-in-picture"></iframe>
@@ -80,7 +78,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- ── Settings ── -->
 <div id="settingsModal">
