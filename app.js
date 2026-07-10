@@ -271,8 +271,17 @@ async function filterGenre(id, el) {
    PLAYER
 ================================================================ */
 async function playMedia(id, type) {
-    state.currentMedia = { id, type };
     const data = await tmdb(`/${type}/${id}`);
+    
+    // Configures state tracking dynamically based on media type
+    state.currentMedia = { 
+        id, 
+        type, 
+        title: data.title || data.name,
+        season: type === 'tv' ? 1 : null,
+        episode: type === 'tv' ? 1 : null
+    };
+    
     document.getElementById('playerTitle').textContent = data.title || data.name;
 
     const epPanel    = document.getElementById('epPanel');
@@ -296,7 +305,12 @@ async function playMedia(id, type) {
     addToHistory(data, type);
 }
 
+
 async function loadEpisodes(id, season) {
+    if (state.currentMedia) {
+        state.currentMedia.season = parseInt(season);
+    }
+    
     const data = await tmdb(`/tv/${id}/season/${season}`);
     document.getElementById('epList').innerHTML = (data.episodes||[]).map(ep => `
         <div class="ep-item" onclick="playEpisode(${season},${ep.episode_number})">
@@ -306,11 +320,18 @@ async function loadEpisodes(id, season) {
     playEpisode(season, 1);
 }
 
+
 function playEpisode(s, e) {
+    if (state.currentMedia) {
+        state.currentMedia.season = parseInt(s);
+        state.currentMedia.episode = parseInt(e);
+    }
+    
     const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
     document.getElementById('streamFrame').src =
         `${base}/tv?tmdb=${state.currentMedia.id}&season=${s}&episode=${e}`;
 }
+
 
 function loadStream() {
     const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
@@ -397,4 +418,25 @@ function toast(msg) {
     el.classList.add('show');
     clearTimeout(_tt);
     _tt = setTimeout(() => el.classList.remove('show'), 2800);
+}
+async function downloadMedia() {
+    if (!state.currentMedia) return;
+
+    const { id, type, season, episode } = state.currentMedia;
+    let downloadUrl = '';
+
+    toast('Opening secure download page...');
+
+    if (type === 'movie') {
+        downloadUrl = `https://vidlink.pro/download/movie/${id}`;
+    } else if (type === 'tv') {
+        // Leverages state coordinates directly
+        downloadUrl = `https://vidlink.pro/download/tv/${id}/${season}/${episode}`;
+    }
+
+    if (downloadUrl) {
+        window.open(downloadUrl, '_blank');
+    } else {
+        toast('Could not generate download link.');
+    }
 }
