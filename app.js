@@ -422,21 +422,21 @@ function toast(msg) {
 async function downloadMedia() {
     if (!state.currentMedia) return;
 
-    const { id, type, season, episode } = state.currentMedia;
-    let downloadUrl = '';
+    const { title, type, season, episode } = state.currentMedia;
+    toast('Searching direct download directories...');
 
-    toast('Opening secure download page...');
+    // Advanced search targeting open cloud servers hosting raw video files
+    let query = `intitle:"index.of" (mp4|mkv|avi) "${title}"`;
 
-    if (type === 'movie') {
-        downloadUrl = `https://vidlink.pro/download/movie/${id}`;
-    } else if (type === 'tv') {
-        // Leverages state coordinates directly
-        downloadUrl = `https://vidlink.pro/download/tv/${id}/${season}/${episode}`;
+    if (type === 'tv') {
+        // Formats numbers to standard production format (e.g., 1 -> 01)
+        const s = String(season).padStart(2, '0');
+        const e = String(episode).padStart(2, '0');
+        // Targets specific files matching season/episode markers like S01E05
+        query += ` (S${s}E${e} || "S${season} E${episode}")`;
     }
 
-    if (downloadUrl) {
-        window.open(downloadUrl, '_blank');
-    } else {
-        toast('Could not generate download link.');
-    }
+    // Opens the direct server directories in a new window
+    const downloadUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    window.open(downloadUrl, '_blank');
 }
