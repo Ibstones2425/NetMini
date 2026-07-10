@@ -331,3 +331,51 @@ iframe#streamFrame { flex: 1; border: none; width: 100%; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
     .ep-panel { display: none; }
 }
+.native-ad-row {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px 20px;
+}
+
+/* Force Adsterra's responsive canvas container to behave nicely */
+.ad-card-wrapper {
+    width: 100%;
+    background: #0d0f14; /* Deep premium canvas tone */
+    border: 1px solid #1e222b;
+    border-radius: 8px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+/* Ensure the native ad title rules look exactly like your movie sections */
+.native-ad-row .section-head {
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+/* ── Ensure Topbar Sits Above All Floating Social Bar Elements ── */
+header.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 999999 !important; /* Forces header menus above ad elements */
+    background: #08090c;       /* Keep background solid so ads don't bleed through */
+}
+
+/* ── Force Player to Cover Both Topbar and All Social Ads ── */
+#playerModal {
+    z-index: 10000000 !important; /* Higher depth than any script injection */
+}
+
+/* ── Native Banner Layout Configuration ── */
+.native-ad-row {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px 20px;
+}
+.ad-card-wrapper {
+    width: 100%;
+    background: #0d0f14;
+    border: 1px solid #1e222b;
+    border-radius: 8px;
+    padding: 16px;
+    overflow: hidden;
+}
