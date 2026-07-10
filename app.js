@@ -25,8 +25,8 @@ const FIREBASE_CONFIG = {
 
 const TMDB_KEY = '51a25aa6c9aac627bd65ba2b10b7aafe';
 
-const PLAYER_S1 = 'https://vsembed.ru/embed';    // Server 1 embed URL
-const PLAYER_S2 = 'https://2embed.org/embed';    // Server 2 embed URL
+const PLAYER_S1 = 'https://vsembed.ru/embed';    // Legacy query syntax
+const PLAYER_S2 = 'https://vidsrc.to/embed';     // Modern path syntax
 
 /* ================================================================
    APP CODE — no need to touch below unless adding features
@@ -168,31 +168,26 @@ async function renderView(viewName, query = '') {
     else if (viewName === 'watchlist') html = buildLibrary('Watchlist', state.user.watchlist);
     else if (viewName === 'history')   html = buildLibrary('Watch History', state.user.history);
 
-    c.innerHTML = html;
+  c.innerHTML = html;
 
-    /* ── High-Revenue SPA Ad Lifecycle Management ── */
+    /* ── High-Revenue Universal SPA Ad Lifecycle Management ── */
     const adWrapper = document.getElementById('homeNativeAdWrapper');
     if (adWrapper) {
-        if (viewName === 'home') {
-            // 1. Rebuild the visual structural slots fresh
-            adWrapper.innerHTML = `
-                <div class="section-head">
-                    <span class="section-title">Suggested For You</span>
-                </div>
-                <div class="ad-card-wrapper" id="container-5e44b31349514dceb01e5ede3c9eb1a4"></div>
-            `;
-            
-            // 2. Instantiate and mount a fresh script instance to trigger a new impression call
-            const nativeScript = document.createElement('script');
-            nativeScript.async = true;
-            nativeScript.setAttribute('data-cfasync', 'false');
-            nativeScript.src = 'https://pl30305264.effectivecpmnetwork.com/5e44b31349514dceb01e5ede3c9eb1a4/invoke.js';
-            
-            adWrapper.appendChild(nativeScript);
-        } else {
-            // Cleanly wipe the HTML content when leaving the page to free up resources
-            adWrapper.innerHTML = '';
-        }
+        // Rebuild structural targets on every route transition to refresh impressions
+        adWrapper.innerHTML = `
+            <div class="section-head" style="margin-top: 40px;">
+                <span class="section-title">Suggested For You</span>
+            </div>
+            <div class="ad-card-wrapper" id="container-5e44b31349514dceb01e5ede3c9eb1a4"></div>
+        `;
+        
+        const nativeScript = document.createElement('script');
+        nativeScript.async = true;
+        nativeScript.setAttribute('data-cfasync', 'false');
+        nativeScript.src = 'https://pl30305264.effectivecpmnetwork.com/5e44b31349514dceb01e5ede3c9eb1a4/invoke.js';
+        
+        adWrapper.appendChild(nativeScript);
+        adWrapper.style.display = 'block';
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -319,9 +314,17 @@ async function playMedia(id, type) {
         loadStream();
     }
 
+    // 1. Open the player modal
     document.getElementById('playerModal').classList.add('open');
+    
+    // 2. Add to user history exactly once
     addToHistory(data, type);
+
+    // 3. Hide the static bottom ad wrapper while playing media streams
+    const targetAdRow = document.getElementById('homeNativeAdWrapper');
+    if (targetAdRow) targetAdRow.style.display = 'none';
 }
+
 
 async function loadEpisodes(id, season) {
     const data = await tmdb(`/tv/${id}/season/${season}`);
@@ -334,14 +337,27 @@ async function loadEpisodes(id, season) {
 }
 
 function playEpisode(s, e) {
-    const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
-    document.getElementById('streamFrame').src =
-        `${base}/tv?tmdb=${state.currentMedia.id}&season=${s}&episode=${e}`;
+    const frame = document.getElementById('streamFrame');
+    
+    if (state.activeServer === 1) {
+        // Server 1 (vsembed) uses query parameters: ?tmdb=ID&season=S&episode=E
+        frame.src = `${PLAYER_S1}/tv?tmdb=${state.currentMedia.id}&season=${s}&episode=${e}`;
+    } else {
+        // Server 2 (vidsrc) uses clean URL paths: /tv/ID/S/E
+        frame.src = `${PLAYER_S2}/tv/${state.currentMedia.id}/${s}/${e}`;
+    }
 }
 
 function loadStream() {
-    const base = state.activeServer === 1 ? PLAYER_S1 : PLAYER_S2;
-    document.getElementById('streamFrame').src = `${base}/movie?tmdb=${state.currentMedia.id}`;
+    const frame = document.getElementById('streamFrame');
+    
+    if (state.activeServer === 1) {
+        // Server 1 (vsembed) uses query parameters: ?tmdb=ID
+        frame.src = `${PLAYER_S1}/movie?tmdb=${state.currentMedia.id}`;
+    } else {
+        // Server 2 (vidsrc) uses clean URL paths: /movie/ID
+        frame.src = `${PLAYER_S2}/movie/${state.currentMedia.id}`;
+    }
 }
 
 function setServer(num) {
@@ -355,7 +371,13 @@ function setServer(num) {
 function closePlayer() {
     document.getElementById('playerModal').classList.remove('open');
     document.getElementById('streamFrame').src = '';
+    
+    /* Bring back the visual banner slot for standard navigation pages */
+    const targetAdRow = document.getElementById('homeNativeAdWrapper');
+    if (targetAdRow) targetAdRow.style.display = 'block';
 }
+
+
 
 /* ================================================================
    WATCHLIST & HISTORY
