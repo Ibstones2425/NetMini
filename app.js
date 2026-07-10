@@ -37,19 +37,22 @@ const IMG_BASE  = 'https://image.tmdb.org/t/p/';
 
 /* Apply APP_NAME everywhere in the DOM */
 document.title = APP_NAME;
-['appNameEl','loginTitleEl','topbarBrandEl'].forEach(id => {
+['appNameEl','topbarBrandEl'].forEach(id => {
     document.getElementById(id).textContent = APP_NAME;
 });
 
-/* ── Firebase init ── */
-let auth, db, currentUser;
+/* ── Firebase init (Firestore only — no auth) ── */
+let db;
 try {
     firebase.initializeApp(FIREBASE_CONFIG);
-    auth = firebase.auth();
-    db   = firebase.firestore();
+    db = firebase.firestore();
 } catch(e) {
     console.warn('[App] Firebase init failed:', e.message);
 }
+
+/* Fixed profile id — since there's no login, everyone who opens this
+   site shares this one Firestore document. */
+const FIXED_UID = 'default-user';
 
 /* ── Runtime state ── */
 let state = {
@@ -60,56 +63,22 @@ let state = {
     activeServer: 1,
 };
 
-/* ================================================================
-   AUTH
-================================================================ */
-if (auth) {
-    auth.onAuthStateChanged(async user => {
-        if (user) { currentUser = user; await bootApp(user); }
-        else showScreen('login');
-    });
-} else {
-    showScreen('login');
-    showErr('Firebase not configured — fill in FIREBASE_CONFIG above.');
-}
-
-document.getElementById('loginBtn').onclick = doLogin;
-document.getElementById('loginPassword').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
-
-async function doLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pass  = document.getElementById('loginPassword').value;
-    if (!email || !pass) { showErr('Fill in both fields.'); return; }
-    const btn = document.getElementById('loginBtn');
-    btn.textContent = 'Signing in…'; btn.disabled = true;
-    hideErr();
-    try {
-        await auth.signInWithEmailAndPassword(email, pass);
-    } catch(e) {
-        const friendly = ['auth/wrong-password','auth/user-not-found','auth/invalid-credential'].includes(e.code)
-            ? 'Invalid email or password.' : e.message;
-        showErr(friendly);
-        btn.textContent = 'Sign In'; btn.disabled = false;
-    }
-}
-
-function showErr(msg) {
-    const el = document.getElementById('loginError');
-    el.textContent = '⚠ ' + msg; el.classList.add('show');
-}
-function hideErr() { document.getElementById('loginError').classList.remove('show'); }
-
-function signOut() {
-    if (auth) auth.signOut();
-    closeSettings();
-    toast('Signed out');
-}
+/* Boot straight into the app — no login gate */
+bootApp().catch(e => {
+    console.error('[App] Boot failed:', e);
+    document.getElementById('bootScreen').innerHTML =
+        `<div style="color:#f55;text-align:center;padding:20px;">Failed to load: ${e.message}</div>`;
+});
 
 /* ================================================================
    FIRESTORE
 ================================================================ */
 async function loadUserData(uid) {
-    if (!db) return;
+    if (!db) {
+        const local = localStorage.getItem('sf0_user');
+        if (local) Object.assign(state.user, JSON.parse(local));
+        return;
+    }
     try {
         const snap = await db.collection('users').doc(uid).get();
         if (snap.exists) {
@@ -121,27 +90,27 @@ async function loadUserData(uid) {
 }
 
 async function saveUserData() {
-    if (!db || !currentUser) {
+    if (!db) {
         localStorage.setItem('sf0_user', JSON.stringify(state.user));
         return;
     }
     try {
-        await db.collection('users').doc(currentUser.uid).set(state.user, { merge: true });
+        await db.collection('users').doc(FIXED_UID).set(state.user, { merge: true });
     } catch(e) { console.warn('[Firestore] save:', e.message); }
 }
 
 /* ================================================================
    BOOT
 ================================================================ */
-async function bootApp(user) {
-    await loadUserData(user.uid);
+async function bootApp() {
+    await loadUserData(FIXED_UID);
     await fetchGenres();
-    document.getElementById('userName').textContent      = state.user.name || user.email;
+    document.getElementById('userName').textContent      = state.user.name || 'Viewer';
     document.getElementById('inputName').value           = state.user.name   || '';
     document.getElementById('inputAvatar').value         = state.user.avatar || '';
-    renderView('home');
     setupNav();
-    showScreen('app');
+    showScreen();
+    await renderView('home');
 }
 
 async function fetchGenres() {
@@ -416,10 +385,9 @@ function resetData() {
 ================================================================ */
 function esc(obj) { return JSON.stringify(obj).replace(/"/g, '&quot;'); }
 
-function showScreen(name) {
+function showScreen() {
     document.getElementById('bootScreen').classList.add('gone');
-    document.getElementById('loginScreen').classList.toggle('active', name === 'login');
-    document.getElementById('appScreen').classList.toggle('active',   name === 'app');
+    document.getElementById('appScreen').classList.add('active');
 }
 
 let _tt;
