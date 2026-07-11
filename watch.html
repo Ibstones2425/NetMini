@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NetMini — Watch</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/watch.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content watch-main">
+
+      <!-- HERO BANNER -->
+      <div class="watch-hero" id="watch-hero">
+        <img class="watch-hero-backdrop" id="watch-hero-backdrop" src="" alt="" loading="lazy">
+        <div class="watch-hero-gradient"></div>
+
+        <button class="watch-hero-back" id="watch-back-btn" aria-label="Go back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        <div class="watch-hero-content">
+          <div class="watch-hero-logo-title" id="watch-hero-title-wrap">
+            <h1 class="watch-hero-title" id="watch-hero-title">
+              <span class="skeleton skeleton-text" style="width:160px;height:22px;display:inline-block"></span>
+            </h1>
+          </div>
+          <button class="watch-hero-play-btn" id="watch-hero-play-btn" aria-label="Play">
+            <svg viewBox="0 0 24 24" width="28" height="28"><polygon points="6 3 21 12 6 21 6 3" fill="currentColor"/></svg>
+          </button>
+        </div>
+
+        <!-- Active server badge on hero -->
+        <div class="watch-hero-server-badge" id="watch-hero-server-badge">
+          <span class="server-badge-dot"></span>
+          <span id="watch-hero-server-label">Cinezo</span>
+        </div>
+      </div>
+
+      <!-- METADATA SECTION -->
+      <div class="watch-meta-section" id="watch-meta-section">
+
+        <div class="watch-brand-row">
+          <div class="watch-brand-pill">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="#E50914"><rect x="3" y="2" width="5" height="20"/><rect x="16" y="2" width="5" height="20"/><rect x="3" y="2" width="18" height="3.5" fill="#E50914"/></svg>
+            FILM
+          </div>
+        </div>
+
+        <h2 class="watch-detail-title" id="watch-title">
+          <span class="skeleton skeleton-text" style="width:200px;height:28px;display:inline-block"></span>
+        </h2>
+
+        <div class="watch-meta-row">
+          <span class="watch-meta-match" id="watch-meta-match" style="display:none"></span>
+          <span class="watch-meta-item" id="watch-meta-year"></span>
+          <span class="watch-meta-badge" id="watch-meta-rating"></span>
+          <span class="watch-meta-item" id="watch-meta-runtime"></span>
+          <span class="watch-meta-hd">HD</span>
+          <button class="watch-server-chip" id="watch-server-chip" aria-label="Change server">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/><circle cx="7" cy="6.5" r="1" fill="currentColor"/><circle cx="7" cy="15.5" r="1" fill="currentColor"/></svg>
+            <span id="watch-server-name">Cinezo</span>
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="watch-action-btns">
+          <button class="watch-btn-play" id="watch-play-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18"><polygon points="6 3 21 12 6 21 6 3" fill="currentColor"/></svg>
+            Play
+          </button>
+          <button class="watch-btn-servers" id="watch-servers-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/><circle cx="7" cy="6.5" r="1" fill="currentColor"/></svg>
+            Switch Server
+          </button>
+        </div>
+
+        <!-- TV Season/Episode selector -->
+        <div class="watch-episode-selector" id="watch-selector" hidden>
+          <div class="watch-selector-row">
+            <div class="watch-select-wrap">
+              <label class="watch-select-label">Season</label>
+              <select class="watch-select" id="season-select"></select>
+            </div>
+            <div class="watch-select-wrap">
+              <label class="watch-select-label">Episode</label>
+              <select class="watch-select" id="episode-select"></select>
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button class="watch-btn-ep-play" id="episode-play-btn">
+                <svg viewBox="0 0 24 24" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+                Watch
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Synopsis -->
+        <p class="watch-synopsis" id="watch-synopsis">
+          <span class="skeleton skeleton-text" style="width:100%;height:12px;margin-bottom:6px;display:block"></span>
+          <span class="skeleton skeleton-text" style="width:90%;height:12px;margin-bottom:6px;display:block"></span>
+          <span class="skeleton skeleton-text" style="width:75%;height:12px;display:block"></span>
+        </p>
+
+        <!-- Cast line -->
+        <p class="watch-cast-line" id="watch-cast-line"></p>
+
+        <!-- Utility icons -->
+        <div class="watch-util-row">
+          <button class="watch-util-btn" id="util-mylist">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>My List</span>
+          </button>
+          <button class="watch-util-btn" id="util-rate">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            <span>Rate</span>
+          </button>
+          <button class="watch-util-btn" id="util-share">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Share</span>
+          </button>
+          <button class="watch-util-btn" id="util-servers-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/><circle cx="7" cy="6.5" r="1.2" fill="currentColor"/><circle cx="7" cy="15.5" r="1.2" fill="currentColor"/></svg>
+            <span>Servers</span>
+          </button>
+        </div>
+
+      </div><!-- /watch-meta-section -->
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       FULLSCREEN PLAYER OVERLAY
+  ═══════════════════════════════════════ -->
+  <div class="player-overlay" id="player-overlay">
+    <!-- Loading state shown while iframe loads -->
+    <div class="iframe-loader" id="iframe-loader">
+      <div class="iframe-loader-ring">
+        <svg viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="22"/>
+        </svg>
+      </div>
+      <div class="iframe-loader-logo">NET<span>MINI</span></div>
+      <div class="iframe-loader-tip" id="iframe-loader-tip">Starting stream…</div>
+    </div>
+
+    <iframe
+      class="player-overlay-iframe"
+      id="player-overlay-iframe"
+      src=""
+      allowfullscreen
+      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+
+    <!-- Controls -->
+    <div class="player-overlay-controls">
+      <button class="player-overlay-close" id="player-overlay-close" aria-label="Close player">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button class="player-overlay-server-btn" id="player-server-switch" aria-label="Switch server">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/></svg>
+        <span id="player-active-server">Cinezo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SERVER MODAL (bottom sheet)
+  ═══════════════════════════════════════ -->
+  <div class="server-modal-overlay" id="server-modal" aria-hidden="true">
+    <div class="server-modal-card">
+      <div class="server-modal-header">
+        <h3 class="server-modal-title">Choose Server</h3>
+        <button class="server-modal-close" id="server-modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <p class="server-modal-hint">Switch if a server doesn't load or buffers.</p>
+      <div class="server-modal-list" id="server-modal-list"></div>
+    </div>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/watch.js"></script>
+</body>
+</html>
