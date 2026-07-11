@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>netMini — Search</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/discover.css">
+  <link rel="stylesheet" href="css/search.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <div class="mobile-wordmark">net<span>Mini</span></div>
+
+      <div class="page-inner">
+        <!-- Back to discover search -->
+        <form id="search-page-form" class="discover-search-form">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <input type="text" id="search-page-input" placeholder="Search for movies, TV shows, people..." autocomplete="off">
+          </div>
+        </form>
+
+        <header class="search-results-header">
+          <h1 id="search-query-title">Search Results</h1>
+        </header>
+
+        <div class="poster-grid" id="search-grid"></div>
+
+        <button class="btn-show-more" id="search-show-more" style="display:none">Show more</button>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>
