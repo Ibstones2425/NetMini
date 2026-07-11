@@ -132,6 +132,13 @@
     const tvParams = type === "tv" ? `&season=${season}&episode=${episode}` : "";
     watchBtn.href = `watch.html?type=${type}&id=${id}${tvParams}`;
 
+    // ── Anime badge ── Surface a "Sub / Dub available via AniList"
+    // pill on the details page so users know the watch page supports
+    // dub switching. Mirrors the isAnime() logic in watch.js but is
+    // self-contained so the details page doesn't need to load anilist.js.
+    const animeBadge = document.getElementById("details-anime-badge");
+    if (animeBadge) animeBadge.hidden = !isAnimeInline(data);
+
     // Tagline
     const taglineEl = document.getElementById("details-tagline");
     if (data.tagline) {
@@ -191,6 +198,30 @@
       "TV-MA":  "18+",
     };
     return map[c] || ( /^\d+$/.test(c) ? c + "+" : c );
+  }
+
+  /* ── Inline anime detection ──
+     Mirrors the isAnime() helper in watch.js so the details page
+     can surface the "Anime · Sub/Dub via AniList" badge without
+     loading anilist.js. The watch page does the full provider
+     routing; here we just need a yes/no. */
+  function isAnimeInline(data) {
+    if (!data) return false;
+    const ANIME_GENRE_IDS = new Set([16]);
+    const ANIME_KEYWORDS  = ["anime","otaku","shounen","shoujo","isekai","mecha"];
+    const isJa = (data.original_language || "").toLowerCase() === "ja";
+    const hasAnimGenre = (data.genres || []).some(g => ANIME_GENRE_IDS.has(g.id));
+    if (isJa && hasAnimGenre) return true;
+    const fromJapan = (data.production_countries || []).some(c =>
+      (c.iso_3166_1 || "").toUpperCase() === "JP" ||
+      (c.name || "").toLowerCase().includes("japan"));
+    if (fromJapan && hasAnimGenre) return true;
+    const kws = (data.keywords && data.keywords.keywords) || [];
+    if (kws.length && kws.some(k => ANIME_KEYWORDS.some(term =>
+      (k.name || "").toLowerCase().includes(term)))) return true;
+    if (data.first_air_date && hasAnimGenre &&
+        (data.episode_run_time || []).some(t => t && t <= 30)) return true;
+    return false;
   }
 
   async function renderEpisodes(data) {

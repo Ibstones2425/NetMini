@@ -67,6 +67,7 @@
     /* Fire all data loads in parallel */
     await loadHero();          /* hero first so it's visible quickly */
     loadTrending();
+    loadTrendingAnime();       /* AniList TRENDING_DESC — independent of TMDB */
     loadTopTen();
     loadStreaming();
     loadNetwork();
@@ -77,6 +78,31 @@
     loadGenres();
     loadAiringToday();
     loadOnTV();
+  }
+
+  /* ── Trending Anime (AniList) ──
+     Fetches top 20 trending anime from AniList and renders them
+     using renderAnimeCard(). Card clicks resolve the TMDB id via
+     findTmdbIdFromAnilistTitle() and redirect to details.html.
+     Independent of TMDB's catalog — surfaces anime that may not
+     even appear in TMDB's trending feeds. */
+  async function loadTrendingAnime() {
+    const row = document.getElementById('anime-trending-row');
+    if (!row) return;
+    // Skeletons are pre-rendered in HTML — replace on success
+    const items = await getAniListTrending(20);
+    if (!items || !items.length) {
+      // Hide the whole section if AniList is unreachable
+      const section = document.getElementById('anime-trending-section');
+      if (section) section.style.display = 'none';
+      return;
+    }
+    row.innerHTML = items.map(item => renderAnimeCard(item)).join('');
+    attachRowArrows();
+    // Wire up the card clicks → TMDB title search → details.html
+    if (typeof attachAnimeCardClicks === 'function') {
+      attachAnimeCardClicks(row);
+    }
   }
 
   /* ── HERO BANNER ──────────────────────────────────────────── */

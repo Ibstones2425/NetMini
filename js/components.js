@@ -225,3 +225,100 @@ document.addEventListener('DOMContentLoaded', renderNav);
 
 /* ── No-op — images now load natively, keeping stub so nothing breaks ── */
 function lazyLoadImages() { /* native loading="lazy" handles this */ }
+
+/* ════════════════════════════════════════════════════════════
+   ANILIST TRENDING CARD
+   Renders an AniList-format card for the "Trending Anime" row
+   on the home page. AniList cards have:
+     • coverImage.large (poster URL — already a TMDB-equivalent
+       w342 image, no URL prefixing needed)
+     • title.english / title.romaji / title.native
+     • averageScore (0-100)
+     • format (TV, TV_SHORT, MOVIE, OVA, ONA, SPECIAL, MUSIC)
+     • episodes
+     • seasonYear
+
+   The card is clickable and triggers a TMDB title search to
+   resolve the corresponding TMDB id, then redirects to the
+   details page so the user lands on the same Netflix-style
+   surface they're used to (and the watch page's isAnime()
+   routing picks up from there).
+   ════════════════════════════════════════════════════════════ */
+function renderAnimeCard(item) {
+  if (!item) return '';
+  const title    = (item.title && (item.title.english || item.title.romaji || item.title.native)) || 'Untitled';
+  const coverUrl = item.coverImage && (item.coverImage.extraLarge || item.coverImage.large);
+  const score    = item.averageScore ? Math.round(item.averageScore) : null;
+  const year     = item.seasonYear || '';
+  const format   = item.format || 'TV';
+  const episodes = item.episodes;
+  const anilistId = item.id;
+
+  // Score badge (AniList scores are 0-100, displayed as "85%")
+  const scoreBadge = score !== null
+    ? `<span class="poster-score">${score}%</span>`
+    : '';
+  // Format badge (TV / MOVIE / OVA / etc.)
+  const formatBadge = `<span class="poster-type-badge">${escapeHtml(format)}</span>`;
+
+  // Body meta: year • episodes
+  const metaBits = [];
+  if (year) metaBits.push(`<span>${year}</span>`);
+  if (episodes) metaBits.push(`<span class="poster-meta-score">${episodes} ep</span>`);
+
+  const imgHtml = coverUrl
+    ? `<img class="nf-img-fade" src="${coverUrl}" alt="${escapeHtml(title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onload="this.classList.add('loaded')" onerror="posterImgError(this)">`
+    : `<div class="img-placeholder">No Image</div>`;
+
+  return `
+    <a class="poster-card anime-card" href="#" data-anilist-id="${anilistId}" data-anilist-title="${escapeHtml(title)}">
+      <div class="poster-card-img-wrap">
+        ${imgHtml}
+        ${formatBadge}
+        ${scoreBadge}
+      </div>
+      <div class="poster-card-body">
+        <div class="poster-card-title">${escapeHtml(title)}</div>
+        ${metaBits.length ? `<div class="poster-card-meta">${metaBits.join('<span class="poster-meta-dot">•</span>')}</div>` : ''}
+      </div>
+    </a>`;
+}
+
+/* ── Wire up clicks on AniList cards ──
+   Card clicks trigger a TMDB title search via findTmdbIdFromAnilistTitle(),
+   then redirect to details.html with the resolved TMDB id. Falls
+   back to opening watch.html?anilist={id} (which the watch page
+   treats as a direct Cinezo anime play) if TMDB lookup fails. */
+function attachAnimeCardClicks(scope) {
+  const root = scope || document;
+  root.querySelectorAll('.anime-card[data-anilist-id]').forEach(card => {
+    if (card._animeClickWired) return;
+    card._animeClickWired = true;
+    card.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const title = card.dataset.anilistTitle;
+      const anilistId = card.dataset.anilistId;
+      // Visual feedback
+      card.style.opacity = '0.6';
+      card.style.pointerEvents = 'none';
+
+      try {
+        // findTmdbIdFromAnilistTitle is defined in anilist.js (loaded before home.js)
+        const match = await findTmdbIdFromAnilistTitle(title);
+        if (match) {
+          window.location.href = `details.html?type=${match.type}&id=${match.id}`;
+          return;
+        }
+      } catch (_) { /* fall through to anilist-only mode */ }
+
+      // Fallback: open watch.html?anilist={id} — watch.js's existing
+      // anilist-mode handler will resolve the rest. (Note: anilist-
+      // mode is a future enhancement; for now we show a toast.)
+      if (typeof showToast === 'function') {
+        showToast('Could not find this title on TMDB — try searching manually');
+      }
+      card.style.opacity = '';
+      card.style.pointerEvents = '';
+    });
+  });
+}
