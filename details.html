@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>netMini — Details</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/details.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <div class="page-inner details-page-inner">
+        <!-- Backdrop hero -->
+        <div class="details-hero" id="details-hero">
+          <button class="details-back-btn" id="back-btn" aria-label="Go back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="details-playlist-btn" id="playlist-btn" aria-label="Add to playlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="details-hero-skeleton skeleton" id="hero-skeleton"></div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="details-title" id="details-title">Loading...</h1>
+
+        <!-- Metadata row -->
+        <div class="details-meta" id="details-meta"></div>
+
+        <!-- Genres -->
+        <div class="details-genres" id="details-genres"></div>
+
+        <!-- Watch Now button -->
+        <a class="btn-primary details-watch-btn" id="watch-now-btn" href="#">
+          <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+          Watch Now
+        </a>
+
+        <!-- Tagline -->
+        <p class="details-tagline" id="details-tagline"></p>
+
+        <!-- Overview -->
+        <div class="details-overview-section">
+          <h3 class="details-section-title">Overview</h3>
+          <p id="details-overview" class="details-overview-text">Loading...</p>
+        </div>
+
+        <!-- Episodes -->
+        <section class="details-episodes-section" id="details-episodes-section" hidden>
+          <div class="section-heading details-episodes-heading">
+            <h3 class="details-section-title">Episodes</h3>
+            <div class="section-label" id="episodes-summary-label">Season 1</div>
+          </div>
+          <div class="chip-row season-tabs" id="season-tabs"></div>
+          <div class="episode-grid" id="episode-grid"></div>
+        </section>
+
+        <!-- Cast & Crew -->
+        <div class="details-cast-section">
+          <h3 class="details-section-title">Cast & Crew</h3>
+          <div class="content-row-wrapper">
+            <div class="content-row" id="details-cast-row"></div>
+          </div>
+        </div>
+
+        <!-- Information -->
+        <div class="details-info-section">
+          <h3 class="details-section-title">Information</h3>
+          <div class="details-info-list" id="details-info-list"></div>
+        </div>
+
+        <!-- Similar Titles -->
+        <div class="details-similar-section">
+          <h3 class="details-section-title">Similar Titles</h3>
+          <div class="content-row-wrapper">
+            <div class="content-row" id="details-similar-row"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/details.js"></script>
+</body>
+</html>
