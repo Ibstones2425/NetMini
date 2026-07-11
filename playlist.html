@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>netMini — Playlist</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/playlist.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <div class="mobile-wordmark">net<span>Mini</span></div>
+
+      <div class="page-inner">
+        <header class="playlist-header">
+          <h1>My Playlist</h1>
+          <p class="playlist-subtitle" id="playlist-count"></p>
+        </header>
+
+        <div class="poster-grid" id="playlist-grid"></div>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/playlist.js"></script>
+</body>
+</html>
