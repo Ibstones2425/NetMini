@@ -114,8 +114,11 @@
     if (year)   metaParts.push(`<span class="meta-sep">•</span><span>${year}</span>`);
     if (type)   metaParts.push(`<span class="meta-sep">•</span><span>${type === 'tv' ? 'TV Show' : 'Movie'}</span>`);
 
+    /* Netflix-style Play + More Info buttons.
+       - Play: white bg, dark text, crisp play icon, hover scale.
+       - More Info: semitransparent gray bg, white text, info icon. */
     section.innerHTML = `
-      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager">
+      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager" onload="this.classList.add('loaded')">
       <div class="hero-gradient"></div>
       <div class="hero-info">
         <div class="hero-badge">Trending Today</div>
@@ -123,10 +126,10 @@
         <div class="hero-meta">${metaParts.join('')}</div>
         <div class="hero-desc">${escapeHtml(item.overview || '')}</div>
         <div class="hero-btns">
-          <a class="btn-primary" href="watch.html?type=${type}&id=${item.id}">
-            ${ICONS.play} Watch Now
+          <a class="btn-play-nf" href="watch.html?type=${type}&id=${item.id}">
+            ${ICONS.play} Play
           </a>
-          <a class="btn-secondary" href="details.html?type=${type}&id=${item.id}">
+          <a class="btn-info-nf" href="details.html?type=${type}&id=${item.id}">
             ${ICONS.info} More Info
           </a>
         </div>

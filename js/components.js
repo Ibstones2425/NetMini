@@ -42,7 +42,9 @@ function posterImgError(el) {
 
 /* ── Render a single poster card ──
    FIXED: uses src= directly with loading="lazy" — not data-src!
-   This is why images weren't showing on mobile. */
+   This is why images weren't showing on mobile.
+   Premium: image fades in (opacity 0.4s) when finished loading
+   from the TMDB API. */
 function renderPosterCard(item, opts = {}) {
   const type  = opts.type || getMediaType(item);
   const title = getTitle(item);
@@ -60,7 +62,7 @@ function renderPosterCard(item, opts = {}) {
     : '';
   const typeBadge = `<span class="poster-type-badge">${type === 'tv' ? 'TV' : 'MOVIE'}</span>`;
   const imgHtml = poster
-    ? `<img src="${poster}" alt="${escapeHtml(title)}" loading="lazy" decoding="async" onerror="posterImgError(this)">`
+    ? `<img class="nf-img-fade" src="${poster}" alt="${escapeHtml(title)}" loading="lazy" decoding="async" onload="this.classList.add('loaded')" onerror="posterImgError(this)">`
     : `<div class="img-placeholder">No Image</div>`;
   const metaBits = [];
   if (year) metaBits.push(`<span>${year}</span>`);
@@ -96,7 +98,7 @@ function renderTopTenCard(item, rank, opts = {}) {
       <div class="poster-card-img-wrap">
         ${
           poster
-            ? `<img src="${poster}" alt="${escapeHtml(title)}" loading="lazy" decoding="async" onerror="posterImgError(this)">`
+            ? `<img class="nf-img-fade" src="${poster}" alt="${escapeHtml(title)}" loading="lazy" decoding="async" onload="this.classList.add('loaded')" onerror="posterImgError(this)">`
             : `<div class="img-placeholder">No Image</div>`
         }
         <span class="poster-type-badge">${type === 'tv' ? 'TV' : 'MOVIE'}</span>
@@ -117,7 +119,7 @@ function renderAvatarRow(items, opts = {}) {
       return `
         <div class="avatar-card">
           <div class="avatar-img-wrap">
-            <img src="${profileSrc}" alt="${escapeHtml(i.name)}" loading="lazy" decoding="async">
+            <img class="nf-img-fade" src="${profileSrc}" alt="${escapeHtml(i.name)}" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
           </div>
           <div class="avatar-name">${escapeHtml(i.name)}</div>
           ${charHtml}
@@ -188,7 +190,9 @@ function attachRowArrows() {
   });
 }
 
-/* ── Render sidebar + bottom nav ── */
+/* ── Render sidebar + bottom nav ──
+   Integrates logo.png into the sidebar wordmark and the
+   mobile top wordmark. */
 function renderNav() {
   const sidebar   = document.getElementById('sidebar');
   const bottomBar = document.getElementById('bottom-bar');
@@ -199,8 +203,20 @@ function renderNav() {
     <a class="nav-item" href="playlist.html"><span class="nav-icon">${ICONS.bookmark}</span><span>Saved</span></a>
     <a class="nav-item" href="more.html"><span class="nav-icon">${ICONS.dots}</span><span>Menu</span></a>
   `;
-  if (sidebar)   sidebar.innerHTML   = `<div class="sidebar-wordmark">NET<span>MINI</span></div><nav class="sidebar-nav">${navHtml}</nav>`;
+  if (sidebar)   sidebar.innerHTML   = `<div class="sidebar-wordmark"><img class="sidebar-logo" src="logo.png" alt="NetMini"><span class="sidebar-wordmark-text">NET<span>MINI</span></span></div><nav class="sidebar-nav">${navHtml}</nav>`;
   if (bottomBar) bottomBar.innerHTML = navHtml;
+
+  /* Inject logo into the mobile top wordmark (if present) */
+  document.querySelectorAll('.mobile-wordmark').forEach(wm => {
+    if (!wm.querySelector('.mobile-logo')) {
+      const logo = document.createElement('img');
+      logo.className = 'mobile-logo';
+      logo.src = 'logo.png';
+      logo.alt = 'NetMini';
+      wm.insertBefore(logo, wm.firstChild);
+    }
+  });
+
   highlightNav();
 }
 
