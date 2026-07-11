@@ -148,3 +148,208 @@
 .info-only:hover {
   transform: none;
 }
+
+/* ============================================================
+   USER GUIDE & PWA INSTALL HELP PANEL
+   ============================================================ */
+
+.install-help-section {
+  margin-bottom: var(--sp-8);
+  padding: var(--sp-5) var(--sp-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+@media (min-width: 768px) {
+  .install-help-section { padding: var(--sp-6) var(--sp-5); }
+}
+
+.install-help-heading {
+  margin-bottom: var(--sp-4);
+}
+
+.install-help-title {
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--sp-2);
+}
+
+.install-help-subtitle {
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  max-width: 560px;
+}
+
+/* ── Status pill (shows when app is already installed) ── */
+.install-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  margin-bottom: var(--sp-4);
+  background: rgba(29, 185, 84, 0.15);
+  border: 1px solid rgba(29, 185, 84, 0.4);
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1db954;
+}
+
+.install-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1db954;
+  box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.2);
+}
+
+/* ── Install cards grid ── */
+.install-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+@media (min-width: 768px) {
+  .install-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-4); }
+}
+
+.install-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-base), background var(--transition-base), transform var(--transition-fast);
+}
+
+.install-card:hover {
+  border-color: var(--color-border-light);
+  background: #1f1f1f;
+  transform: translateY(-2px);
+}
+
+.install-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.install-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.install-card-icon.ios-icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.install-card-icon.android-icon {
+  background: rgba(29, 185, 84, 0.15);
+  color: #1db954;
+}
+
+.install-card-icon.desktop-icon {
+  background: rgba(229, 9, 20, 0.15);
+  color: var(--color-accent);
+}
+
+.install-card-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.install-card-subtitle {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.install-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  counter-reset: step;
+}
+
+.install-steps li {
+  position: relative;
+  padding-left: 32px;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  counter-increment: step;
+}
+
+.install-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.install-steps li strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+/* ── One-tap install button (Android/Chrome only) ── */
+.install-btn-nf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--color-accent);
+  color: #FFFFFF;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-fast);
+  min-height: var(--tap-min);
+  margin-top: auto;
+  letter-spacing: -0.01em;
+}
+
+.install-btn-nf:hover {
+  background: var(--color-accent-hover);
+  transform: scale(1.04);
+}
+
+.install-btn-nf:active { transform: scale(0.97); }
+.install-btn-nf:disabled { opacity: 0.6; cursor: wait; }
+.install-btn-nf svg { flex-shrink: 0; }

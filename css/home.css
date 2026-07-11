@@ -1,5 +1,7 @@
 /* ============================================================
-   home.css — Home page styles including the hero banner.
+   home.css — Home page styles including the Netflix hero banner.
+   Hero: 65vh mobile / 80vh desktop, bottom gradient blends
+   perfectly from transparent into solid #141414 background.
    ============================================================ */
 
 /* ── Home header ── */
@@ -25,8 +27,9 @@
 
 /* ============================================================
    NETFLIX-STYLE HERO BANNER
-   Full-bleed backdrop with gradient, title, meta, and CTA buttons.
-   Mobile: 65vh immersive. Desktop: 75-80vh cinematic.
+   Full-bleed backdrop with bottom gradient mask, title, meta,
+   and Play + More Info action buttons.
+   Mobile: 65vh immersive. Desktop: 80vh cinematic.
    ============================================================ */
 
 #hero-section {
@@ -50,15 +53,15 @@
 @media (min-width: 1024px) {
   #hero-section {
     margin: 0 calc(-1 * var(--sp-8)) var(--sp-8);
-    min-height: 78vh;
-    height: 78vh;
+    min-height: 80vh;
+    height: 80vh;
   }
 }
 @media (min-width: 1400px) {
   #hero-section { min-height: 80vh; height: 80vh; }
 }
 
-/* Hero image — fills container */
+/* Hero image — fills container, fades in when loaded */
 .hero-backdrop {
   position: absolute;
   inset: 0;
@@ -67,17 +70,21 @@
   object-fit: cover;
   object-position: center top;
   display: block;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
 }
+.hero-backdrop.loaded { opacity: 1; }
 
-/* Gradient overlay — blends perfectly with app background var(--color-bg) #0a0a0a */
+/* Bottom mask — heavy seamless gradient blending perfectly
+   from transparent into solid #141414 to hide the lower edge. */
 .hero-gradient {
   position: absolute; inset: 0;
   background: linear-gradient(
     to top,
-    var(--color-bg) 0%,
-    rgba(10,10,10,0.92) 18%,
-    rgba(10,10,10,0.55) 45%,
-    rgba(10,10,10,0.15) 75%,
+    #141414 0%,
+    rgba(20, 20, 20, 0.92) 18%,
+    rgba(20, 20, 20, 0.55) 45%,
+    rgba(20, 20, 20, 0.15) 75%,
     transparent 100%
   );
 }
@@ -88,26 +95,27 @@
     background:
       linear-gradient(
         to top,
-        var(--color-bg) 0%,
-        rgba(10,10,10,0.85) 22%,
-        rgba(10,10,10,0.4) 55%,
-        rgba(10,10,10,0.05) 100%
+        #141414 0%,
+        rgba(20, 20, 20, 0.85) 22%,
+        rgba(20, 20, 20, 0.4) 55%,
+        rgba(20, 20, 20, 0.05) 100%
       ),
       linear-gradient(
         to right,
-        rgba(10,10,10,0.85) 0%,
-        rgba(10,10,10,0.4) 35%,
+        rgba(20, 20, 20, 0.85) 0%,
+        rgba(20, 20, 20, 0.4) 35%,
         transparent 70%
       );
   }
 }
 
-/* Hero info overlay */
+/* Hero info overlay — left-aligned, stacked tightly */
 .hero-info {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: var(--sp-5) var(--sp-3) var(--sp-4);
   max-width: 600px;
   z-index: 4;
+  text-align: left;
 }
 
 @media (min-width: 480px) { .hero-info { padding: var(--sp-6) var(--sp-4) var(--sp-5); } }
@@ -124,34 +132,39 @@
 }
 
 .hero-title {
-  font-size: clamp(1.5rem, 6vw, 3rem);
-  font-weight: 900; line-height: 1.05;
+  font-size: clamp(1.8rem, 8vw, 3.6rem);
+  font-weight: 900; line-height: 1.02;
   color: #fff; margin-bottom: var(--sp-3);
   letter-spacing: -0.02em;
   text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+  text-align: left;
 }
 
 .hero-meta {
-  font-size: 0.78rem; color: #bbb;
+  font-size: 0.78rem; color: #B3B3B3;
   margin-bottom: var(--sp-3);
   display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+  text-align: left;
 }
 @media (min-width: 768px) { .hero-meta { font-size: 0.88rem; } }
-.hero-meta .meta-star { color: var(--color-warning); }
+.hero-meta .meta-star { color: var(--color-warning); font-weight: 700; }
 .hero-meta .meta-sep { color: #555; }
 
 .hero-desc {
-  font-size: 0.8rem; color: #ccc; line-height: 1.6;
+  font-size: 0.85rem; color: #DADADA; line-height: 1.6;
   margin-bottom: var(--sp-4);
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   max-width: 540px;
+  text-align: left;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
 }
 
-@media (min-width: 480px) { .hero-desc { font-size: 0.85rem; -webkit-line-clamp: 4; } }
-@media (min-width: 768px) { .hero-desc { font-size: 0.92rem; max-width: 580px; } }
+@media (min-width: 480px) { .hero-desc { font-size: 0.9rem; -webkit-line-clamp: 4; } }
+@media (min-width: 768px) { .hero-desc { font-size: 0.95rem; max-width: 580px; } }
 
 .hero-btns {
   display: flex; gap: var(--sp-2); flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 /* ── Hero navigation dots ── */
@@ -175,7 +188,7 @@
   height: 65vh;
 }
 @media (min-width: 768px)  { .hero-skeleton { min-height: 70vh; height: 70vh; } }
-@media (min-width: 1024px) { .hero-skeleton { min-height: 78vh; height: 78vh; } }
+@media (min-width: 1024px) { .hero-skeleton { min-height: 80vh; height: 80vh; } }
 @media (min-width: 1400px) { .hero-skeleton { min-height: 80vh; height: 80vh; } }
 
 /* ── Hero genre badges ── */

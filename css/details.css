@@ -1,19 +1,24 @@
 /* ============================================================
-   details.css — Details page specific styles
+   details.css — Details page styles
+   Netflix pop-up canvas layout: two-column split below the
+   backdrop hero. LEFT → title, meta (year • age rating •
+   runtime), Play button, tagline, full-paragraph synopsis.
+   RIGHT → "Cast:", "Genres:", "This movie is:" stacked with
+   muted #B3B3B3 labels.
    ============================================================ */
 
 .details-page-inner {
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
-  max-width: 900px;
+  max-width: 1100px;
 }
 
 @media (min-width: 768px) {
   .details-page-inner { padding-left: var(--sp-6); padding-right: var(--sp-6); }
 }
 
-/* ── Hero backdrop ── */
+/* ── Hero backdrop (16:9) ── */
 .details-hero {
   position: relative;
   width: 100%;
@@ -30,8 +35,12 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
 }
+.details-hero img.loaded { opacity: 1; }
 
+/* Netflix-style bottom gradient blending into #141414 */
 .details-hero::after {
   content: "";
   position: absolute;
@@ -42,8 +51,8 @@
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(10,10,10,0.6) 50%,
-    var(--color-bg) 100%
+    rgba(20,20,20,0.6) 50%,
+    #141414 100%
   );
   pointer-events: none;
 }
@@ -121,35 +130,63 @@
   fill: var(--color-accent);
 }
 
-/* ── Title ── */
-.details-title {
-  text-align: center;
-  font-size: clamp(1.3rem, 5vw, 2.4rem);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  margin: var(--sp-4) var(--sp-3) var(--sp-2);
-  line-height: 1.2;
-}
+/* ════════════════════════════════════════════════════════════
+   NETFLIX POP-UP CANVAS — split metadata layout
+   ════════════════════════════════════════════════════════════ */
 
-/* ── Metadata row ── */
-.details-meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
-  padding: 0 var(--sp-3);
-  margin-bottom: var(--sp-2);
-  font-size: 0.78rem;
-  color: var(--color-text-secondary);
+.details-canvas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-5);
+  padding: var(--sp-4) var(--sp-3) 0;
 }
 
 @media (min-width: 480px) {
-  .details-meta {
-    gap: var(--sp-3);
-    padding: 0 var(--sp-4);
-    font-size: 0.85rem;
+  .details-canvas { padding: var(--sp-5) var(--sp-4) 0; gap: var(--sp-6); }
+}
+
+@media (min-width: 768px) {
+  .details-canvas {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--sp-8);
+    padding-top: var(--sp-6);
   }
+}
+
+@media (min-width: 1024px) {
+  .details-canvas {
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+    gap: var(--sp-10);
+  }
+}
+
+/* ── LEFT column: title + meta + synopsis ── */
+.details-canvas-left { min-width: 0; }
+
+.details-title {
+  text-align: left;
+  font-size: clamp(1.6rem, 6vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--sp-3);
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+
+/* ── Metadata row: year • age rating • runtime ── */
+.details-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+@media (min-width: 480px) {
+  .details-meta { gap: var(--sp-3); font-size: 0.92rem; }
 }
 
 .details-meta .tmdb-badge {
@@ -175,84 +212,179 @@
   color: var(--color-text-disabled);
 }
 
-/* ── Genres ── */
-.details-genres {
-  display: flex;
+/* Netflix-style age rating badge — clean bordered box (e.g. 13+, 18+) */
+.details-meta .age-rating-badge {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  min-width: 32px;
+  padding: 2px 8px;
+  border: 1.5px solid var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  background: rgba(20, 20, 20, 0.6);
+  line-height: 1.1;
+}
+
+@media (min-width: 480px) {
+  .details-meta .age-rating-badge {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+  }
+}
+
+/* ── Action row: Play + My List ── */
+.details-action-row {
+  display: flex;
   gap: var(--sp-2);
   flex-wrap: wrap;
-  padding: 0 var(--sp-3);
   margin-bottom: var(--sp-4);
+  align-items: center;
 }
 
-@media (min-width: 480px) {
-  .details-genres { padding: 0 var(--sp-4); margin-bottom: var(--sp-5); }
-}
-
-.details-genres .chip {
-  font-size: 0.68rem;
-  padding: 2px var(--sp-3);
-  cursor: default;
-}
-
-@media (min-width: 480px) {
-  .details-genres .chip { font-size: 0.72rem; padding: 3px var(--sp-3); }
-}
-
-/* ── Watch Now button ── */
 .details-watch-btn {
-  max-width: 400px;
-  margin: 0 auto var(--sp-3);
-  display: flex;
+  flex: 0 0 auto;
+  min-width: 120px;
 }
 
-@media (min-width: 480px) {
-  .details-watch-btn { margin-bottom: var(--sp-4); }
+.details-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  background: rgba(109, 109, 110, 0.6);
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-fast);
+  min-height: var(--tap-min);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.details-save-btn:hover { background: rgba(109, 109, 110, 0.85); transform: scale(1.04); }
+.details-save-btn:active { transform: scale(0.97); }
+.details-save-btn svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; }
+.details-save-btn.saved {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+}
+.details-save-btn.saved svg {
+  stroke: var(--color-accent);
+  fill: var(--color-accent);
 }
 
 /* ── Tagline ── */
 .details-tagline {
-  text-align: center;
+  text-align: left;
   font-style: italic;
   color: var(--color-text-muted);
-  font-size: 0.82rem;
-  margin-bottom: var(--sp-5);
-  padding: 0 var(--sp-3);
+  font-size: 0.85rem;
+  margin-bottom: var(--sp-4);
 }
 
 @media (min-width: 480px) {
-  .details-tagline { font-size: 0.9rem; margin-bottom: var(--sp-6); padding: 0 var(--sp-4); }
+  .details-tagline { font-size: 0.95rem; margin-bottom: var(--sp-5); }
 }
 
 .details-tagline:empty { display: none; }
 
 /* ── Section titles ── */
 .details-section-title {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   margin-bottom: var(--sp-3);
   color: var(--color-text-primary);
+  letter-spacing: -0.02em;
 }
 
 @media (min-width: 480px) {
-  .details-section-title { font-size: 1rem; }
+  .details-section-title { font-size: 1.1rem; }
 }
 
-/* ── Overview ── */
+/* ── Overview / Synopsis ── */
 .details-overview-section {
-  padding: 0 var(--sp-3);
   margin-bottom: var(--sp-5);
 }
 
 @media (min-width: 480px) {
-  .details-overview-section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+  .details-overview-section { margin-bottom: var(--sp-6); }
 }
 
 .details-overview-text {
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 0.92rem;
+  line-height: 1.7;
   color: var(--color-text-secondary);
   text-align: left;
+}
+
+@media (min-width: 480px) {
+  .details-overview-text { font-size: 1rem; line-height: 1.75; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT column: Cast / Genres / "This movie is:" fact block
+   Each block uses a muted #B3B3B3 label and a primary-white
+   value, stacked vertically — exactly like the Netflix pop-up.
+   ════════════════════════════════════════════════════════════ */
+
+.details-canvas-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+@media (min-width: 480px) {
+  .details-canvas-right { gap: var(--sp-5); }
+}
+
+.details-fact-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+}
+
+.details-fact-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted); /* Netflix-muted label */
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 480px) {
+  .details-fact-label { font-size: 0.85rem; }
+}
+
+.details-fact-value {
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+@media (min-width: 480px) {
+  .details-fact-value { font-size: 0.92rem; }
+}
+
+/* Mood tag chips inside the "This movie is:" block */
+.details-fact-value .mood-tag {
+  display: inline-block;
+  padding: 3px 9px;
+  margin: 2px 4px 2px 0;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-border-light);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 /* ── Episodes ── */
@@ -323,7 +455,7 @@
 
 .episode-card:hover {
   border-color: var(--color-border-light);
-  background: #1a1a1a;
+  background: #1f1f1f;
   transform: translateY(-1px);
 }
 
@@ -415,10 +547,6 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-}
-
-@media (min-width: 480px) {
-  .details-overview-text { font-size: 0.92rem; line-height: 1.7; }
 }
 
 /* ── Cast ── */

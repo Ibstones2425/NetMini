@@ -5,7 +5,7 @@
    ============================================================ */
 
 /* ── App Shell ── */
-.app-shell { display: flex; min-height: 100vh; }
+.app-shell { display: flex; min-height: 100vh; background: var(--color-bg); }
 
 /* ── Sidebar (desktop ≥1024px only) ── */
 .sidebar { display: none; }
@@ -17,22 +17,33 @@
     width: var(--sidebar-width); height: 100vh;
     background: var(--color-bg-2);
     border-right: 1px solid var(--color-border);
-    z-index: 100; padding: var(--sp-5) 0;
+    z-index: 100;
+    padding: calc(var(--sp-5) + var(--safe-area-top)) 0 var(--sp-5);
     overflow-y: auto; flex-shrink: 0;
   }
   .main-content { margin-left: var(--sidebar-width); }
 }
 
-/* ── Sidebar wordmark ── */
+/* ── Sidebar wordmark (logo.png image variant) ── */
 .sidebar-wordmark {
+  display: flex; align-items: center; gap: var(--sp-2);
   padding: 0 var(--sp-5) var(--sp-5);
-  font-size: 1.25rem; font-weight: 900;
-  letter-spacing: 0.05em; text-transform: uppercase;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--sp-3);
+}
+.sidebar-wordmark img.sidebar-logo {
+  width: 28px; height: 28px; border-radius: var(--radius-sm); flex-shrink: 0;
+}
+.sidebar-wordmark .sidebar-wordmark-text {
+  font-size: 1.25rem; font-weight: 900;
+  letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--color-text-primary);
 }
-.sidebar-wordmark span { color: var(--color-accent); }
+.sidebar-wordmark .sidebar-wordmark-text span { color: var(--color-accent); }
+/* Horizontal logo.png variant */
+.sidebar-wordmark img.sidebar-logo-full {
+  height: 22px; width: auto; flex-shrink: 0;
+}
 
 /* ── Sidebar nav ── */
 .sidebar-nav {
@@ -74,7 +85,9 @@
   .nav-item svg { width: 20px; height: 20px; }
 }
 
-/* ── Bottom tab bar (mobile < 1024px) ── */
+/* ── Bottom tab bar (mobile < 1024px) ──
+   Padded above the iOS/Android home-indicator bar via
+   env(safe-area-inset-bottom). */
 .bottom-bar {
   display: flex; position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -98,17 +111,25 @@
 }
 @media (min-width: 1024px) { .main-content { padding-bottom: var(--sp-8); } }
 
-/* ── Mobile top wordmark ── */
+/* ── Mobile top wordmark ──
+   Padded from the top by env(safe-area-inset-top) so the
+   wordmark never collides with notches, dynamic island, or
+   the status bar on iOS/Android. */
 .mobile-wordmark {
-  display: flex; align-items: center;
-  padding: var(--sp-3) var(--sp-3) 0;
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: calc(var(--sp-3) + var(--safe-area-top)) var(--sp-3) var(--sp-3);
   font-size: 1.1rem; font-weight: 900;
   letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--color-text-primary);
+  background: var(--color-bg);
+  position: sticky; top: 0; z-index: 50;
+}
+.mobile-wordmark img.mobile-logo {
+  width: 24px; height: 24px; border-radius: var(--radius-sm); flex-shrink: 0;
 }
 .mobile-wordmark span { color: var(--color-accent); }
 @media (min-width: 480px) {
-  .mobile-wordmark { padding: var(--sp-4) var(--sp-4) 0; font-size: 1.25rem; }
+  .mobile-wordmark { padding: calc(var(--sp-4) + var(--safe-area-top)) var(--sp-4) var(--sp-4); font-size: 1.25rem; }
 }
 @media (min-width: 1024px) { .mobile-wordmark { display: none; } }
 
@@ -182,7 +203,8 @@
 @media (min-width: 480px) { .chip { font-size: 0.78rem; padding: 8px 14px; min-height: 36px; } }
 @media (min-width: 768px) { .chip { min-height: var(--tap-min); padding: 8px 16px; } }
 
-/* ── Content row (horizontal scroll) ── */
+/* ── Content row (horizontal scroll) ──
+   Netflix-style: hide scrollbars but keep frictionless touch-swipe. */
 .content-row-wrapper { position: relative; min-width: 0; }
 
 .content-row {
@@ -215,12 +237,18 @@
 
 /* ── Poster card ──
    320px: 84px wide, 3 cards visible in ~290px row gap 8px
-   Compact but readable and clearly tapable */
+   Compact but readable and clearly tapable.
+   Netflix-style: crisp 2:3 aspect ratio, hover scales 1.08,
+   elevates z-index, and casts a sharp dark shadow. */
 .poster-card {
   flex-shrink: 0; width: 84px;
   display: flex; flex-direction: column; gap: 5px;
   cursor: pointer; scroll-snap-align: start;
   text-decoration: none; -webkit-tap-highlight-color: transparent;
+  position: relative; /* for hover z-index stacking */
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              z-index 0s 0s,
+              box-shadow 0.28s ease;
 }
 @media (min-width: 360px) { .poster-card { width: 92px; } }
 @media (min-width: 380px) { .poster-card { width: 100px; } }
@@ -228,17 +256,34 @@
 @media (min-width: 768px) { .poster-card { width: 140px; } }
 @media (min-width: 1024px) {
   .poster-card { width: 152px; }
-  .poster-card:hover { transform: scale(1.04); }
+  /* Netflix hover scale: lift the card, elevate z-index, sharp shadow */
+  .poster-card:hover {
+    transform: scale(1.08);
+    z-index: 20;
+    box-shadow: var(--shadow-card-hover);
+  }
 }
+
+/* Backdrop / landscape carousel cards (16:9) — used for hero
+   carousel or special featured rows. */
+.poster-card.backdrop-card { width: 240px; }
+@media (min-width: 480px) { .poster-card.backdrop-card { width: 320px; } }
+@media (min-width: 768px) { .poster-card.backdrop-card { width: 380px; } }
+@media (min-width: 1024px) { .poster-card.backdrop-card { width: 420px; } }
+.poster-card.backdrop-card .poster-card-img-wrap { aspect-ratio: 16/9; }
 
 .poster-card-img-wrap {
   position: relative; border-radius: var(--radius-md); overflow: hidden;
-  aspect-ratio: 2/3; background: var(--color-bg-3); flex-shrink: 0;
+  aspect-ratio: 2/3; background: var(--color-bg-skeleton); flex-shrink: 0;
   border: 1px solid rgba(255,255,255,0.06);
 }
 .poster-card-img-wrap img {
   width: 100%; height: 100%; object-fit: cover; display: block;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease;
+}
+/* Subtle zoom inside the wrap when card itself is hovered */
+@media (min-width: 1024px) {
+  .poster-card:hover .poster-card-img-wrap img { transform: scale(1.04); }
 }
 
 /* FIX: make sure broken images don't show ugly borders */
@@ -375,7 +420,42 @@
 @media (min-width: 480px) { .avatar-name { font-size: 0.7rem; } }
 .avatar-character { font-size: 0.56rem; color: var(--color-text-muted); text-align: center; line-height: 1.2; }
 
-/* ── Buttons ── */
+/* ── Netflix-style buttons ── */
+
+/* Play button — bright white background, dark text, crisp play icon */
+.btn-play-nf {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--sp-2); padding: var(--sp-3) var(--sp-6);
+  background: #FFFFFF; color: #000000;
+  font-size: 0.95rem; font-weight: 700;
+  border-radius: var(--radius-sm); border: none; cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-fast);
+  text-decoration: none; white-space: nowrap;
+  min-height: var(--tap-min);
+  letter-spacing: -0.01em;
+}
+.btn-play-nf:hover  { background: rgba(255,255,255,0.85); transform: scale(1.04); }
+.btn-play-nf:active { transform: scale(0.97); }
+.btn-play-nf svg { width: 18px; height: 18px; fill: #000; }
+
+/* More Info button — semitransparent gray, white text, info icon */
+.btn-info-nf {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--sp-2); padding: var(--sp-3) var(--sp-6);
+  background: rgba(109, 109, 110, 0.7); color: #FFFFFF;
+  font-size: 0.95rem; font-weight: 600;
+  border-radius: var(--radius-sm); border: none; cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-fast);
+  text-decoration: none; white-space: nowrap;
+  min-height: var(--tap-min);
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.btn-info-nf:hover  { background: rgba(109, 109, 110, 0.85); transform: scale(1.04); }
+.btn-info-nf:active { transform: scale(0.97); }
+.btn-info-nf svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; }
+
+/* Legacy button aliases (kept for backwards compat) */
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
   gap: var(--sp-2); padding: var(--sp-3) var(--sp-5);
@@ -393,13 +473,13 @@
 .btn-secondary {
   display: inline-flex; align-items: center; justify-content: center;
   gap: var(--sp-2); padding: var(--sp-3) var(--sp-5);
-  background: rgba(255,255,255,0.12); color: #fff;
+  background: rgba(109, 109, 110, 0.7); color: #fff;
   font-size: 0.9rem; font-weight: 600;
   border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.2);
   cursor: pointer; transition: background var(--transition-base); white-space: nowrap;
   min-height: var(--tap-min);
 }
-.btn-secondary:hover { background: rgba(255,255,255,0.2); }
+.btn-secondary:hover { background: rgba(109, 109, 110, 0.85); }
 .btn-secondary svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; }
 
 .btn-show-more {
@@ -429,6 +509,8 @@
   overflow-y: auto; padding: var(--sp-5);
   animation: slideUp var(--transition-slow);
   -webkit-overflow-scrolling: touch;
+  /* Pad above the iOS home indicator */
+  padding-bottom: calc(var(--sp-5) + var(--safe-area-bottom));
 }
 @media (min-width: 640px) { .modal-card { border-radius: var(--radius-xl); max-height: 70vh; } }
 
