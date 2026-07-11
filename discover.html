@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>netMini — Discover</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/discover.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <div class="mobile-wordmark">net<span>Mini</span></div>
+
+      <div class="page-inner">
+        <!-- 1. Search input -->
+        <form id="discover-search-form" class="discover-search-form">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <input type="text" id="discover-search-input" placeholder="Search for movies, TV shows, people..." autocomplete="off">
+          </div>
+        </form>
+
+        <!-- 2. Discover heading + full chip row -->
+        <header class="discover-header">
+          <h1>Discover</h1>
+          <div class="chip-row discover-chips" id="discover-chips">
+            <button class="chip" data-filter="filters">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="9" cy="18" r="2" fill="currentColor"/></svg>
+              <span>Filters</span>
+            </button>
+            <button class="chip active" data-filter="movie">Movies</button>
+            <button class="chip" data-filter="tv">TV Shows</button>
+            <button class="chip" data-filter="playlists">Top Playlists</button>
+            <button class="chip" data-filter="people">People</button>
+            <button class="chip" data-filter="networks">Networks</button>
+            <button class="chip" data-filter="companies">Companies</button>
+            <button class="chip" data-filter="movie-genres">Movie Genres</button>
+            <button class="chip" data-filter="tv-genres">TV Shows Genres</button>
+          </div>
+        </header>
+
+        <!-- 3/4. Curated sections (default) or filtered grid -->
+        <div id="discover-default">
+          <section class="content-section" id="d-trending-section">
+            <div class="section-heading">
+              <h2 class="section-title">Trending</h2>
+              <div class="chip-row" id="d-trending-chips">
+                <button class="chip active" data-type-toggle="movie">Movies</button>
+                <button class="chip" data-type-toggle="tv">TV Shows</button>
+              </div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-trending-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-streaming-section">
+            <div class="section-heading">
+              <h2 class="section-title">Streaming</h2>
+              <div class="section-label">TV SHOWS</div>
+            </div>
+            <div class="chip-row" id="d-streaming-chips"></div>
+            <div class="content-row-wrapper" style="margin-top:12px">
+              <div class="content-row" id="d-streaming-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-network-section">
+            <div class="section-heading">
+              <h2 class="section-title">Network Productions</h2>
+              <div class="section-label">TV SHOWS</div>
+            </div>
+            <div class="chip-row" id="d-network-chips"></div>
+            <div class="content-row-wrapper" style="margin-top:12px">
+              <div class="content-row" id="d-network-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-now-playing-section">
+            <div class="section-heading">
+              <h2 class="section-title">Now Playing</h2>
+              <div class="section-label">MOVIES</div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-now-playing-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-upcoming-section">
+            <div class="section-heading">
+              <h2 class="section-title">Upcoming</h2>
+              <div class="section-label">MOVIES</div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-upcoming-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-popular-section">
+            <div class="section-heading">
+              <h2 class="section-title">Popular</h2>
+              <div class="chip-row" id="d-popular-chips">
+                <button class="chip active" data-type-toggle="movie">Movies</button>
+                <button class="chip" data-type-toggle="tv">TV Shows</button>
+              </div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-popular-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-top-rated-section">
+            <div class="section-heading">
+              <h2 class="section-title">Top Rated</h2>
+              <div class="chip-row" id="d-top-rated-chips">
+                <button class="chip active" data-type-toggle="movie">Movies</button>
+                <button class="chip" data-type-toggle="tv">TV Shows</button>
+              </div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-top-rated-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-people-section">
+            <div class="section-heading">
+              <h2 class="section-title">Popular People</h2>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-people-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-airing-today-section">
+            <div class="section-heading">
+              <h2 class="section-title">Airing Today</h2>
+              <div class="section-label">TV SHOWS</div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-airing-today-row"></div>
+            </div>
+          </section>
+
+          <section class="content-section" id="d-on-tv-section">
+            <div class="section-heading">
+              <h2 class="section-title">On TV</h2>
+              <div class="section-label">TV SHOWS</div>
+            </div>
+            <div class="content-row-wrapper">
+              <div class="content-row" id="d-on-tv-row"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Filtered grid view -->
+        <div id="discover-filtered" hidden>
+          <div class="discover-grid-header">
+            <h2 id="filtered-title">Results</h2>
+          </div>
+          <div class="poster-grid" id="filtered-grid"></div>
+          <button class="btn-show-more" id="show-more-btn">Show more</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/discover.js"></script>
+</body>
+</html>
