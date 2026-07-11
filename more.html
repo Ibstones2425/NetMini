@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>netMini — More</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/more.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <div class="mobile-wordmark">net<span>Mini</span></div>
+
+      <div class="page-inner">
+        <header class="more-header">
+          <h1>Menu</h1>
+          <p class="more-subtitle">A clean browse hub inspired by FluxTV, rebuilt for NetMini without ads, auth, or player changes.</p>
+        </header>
+
+        <section class="menu-section">
+          <div class="menu-section-label">Browse</div>
+          <div class="menu-grid">
+            <a class="menu-item" href="index.html">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></span>
+              <span class="menu-item-text"><strong>Home</strong><small>Featured rows and hero picks</small></span>
+            </a>
+            <a class="menu-item" href="discover.html?type=movie">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3V9z"/></svg></span>
+              <span class="menu-item-text"><strong>Movies</strong><small>Popular and top-rated films</small></span>
+            </a>
+            <a class="menu-item" href="discover.html?type=tv">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg></span>
+              <span class="menu-item-text"><strong>TV Shows</strong><small>Series, seasons, and episodes</small></span>
+            </a>
+            <a class="menu-item" href="discover.html">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 14l8-3 5 8-8 3z"/><path d="M11 11l4-7 5 3-4 7"/></svg></span>
+              <span class="menu-item-text"><strong>Trending</strong><small>Fresh picks across categories</small></span>
+            </a>
+          </div>
+        </section>
+
+        <section class="menu-section">
+          <div class="menu-section-label">Genres</div>
+          <div class="genre-menu-grid">
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=28">Action</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=35">Comedy</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=27">Horror</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=878">Sci-Fi</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=53">Thriller</a>
+            <a class="genre-menu-pill" href="discover.html?type=tv&genre=18">Drama</a>
+            <a class="genre-menu-pill" href="discover.html?type=tv&genre=16">Animation</a>
+            <a class="genre-menu-pill" href="discover.html?type=tv&genre=10759">Adventure</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=99">Docs</a>
+            <a class="genre-menu-pill" href="discover.html?type=movie&genre=10749">Romance</a>
+          </div>
+        </section>
+
+        <section class="menu-section">
+          <div class="menu-section-label">More</div>
+          <div class="menu-list">
+            <a class="menu-list-item" href="search.html">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
+              <span class="menu-item-text"><strong>Search</strong><small>Find any movie or series fast</small></span>
+            </a>
+            <a class="menu-list-item" href="playlist.html">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+              <span class="menu-item-text"><strong>Saved</strong><small>Your local watchlist</small></span>
+            </a>
+            <div class="menu-list-item info-only">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+              <span class="menu-item-text"><strong>About NetMini</strong><small>Vanilla JS TMDB browser with protected native player flow</small></span>
+            </div>
+            <div class="menu-list-item info-only">
+              <span class="menu-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M3 21h18"/></svg></span>
+              <span class="menu-item-text"><strong>Legal</strong><small>Metadata via TMDB. NetMini does not host media files.</small></span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+
+  <div id="toast"></div>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+</body>
+</html>
