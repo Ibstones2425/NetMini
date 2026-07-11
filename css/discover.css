@@ -1,0 +1,105 @@
+/* ============================================================
+   discover.css — Discover page specific styles
+   ============================================================ */
+
+/* ── Search input ── */
+.discover-search-form {
+  margin-bottom: var(--sp-4);
+}
+
+@media (min-width: 480px) {
+  .discover-search-form { margin-bottom: var(--sp-5); }
+}
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  padding: var(--sp-2) var(--sp-4);
+  transition: border-color var(--transition-base);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (min-width: 480px) {
+  .search-input-wrap { gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); }
+}
+
+.search-input-wrap:focus-within {
+  border-color: var(--color-accent);
+}
+
+.search-input-wrap svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--color-text-muted);
+  fill: none;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+@media (min-width: 480px) {
+  .search-input-wrap svg { width: 18px; height: 18px; }
+}
+
+.search-input-wrap input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
+  outline: none;
+  min-width: 0;
+}
+
+@media (min-width: 480px) {
+  .search-input-wrap input { font-size: 0.95rem; }
+}
+
+.search-input-wrap input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── Discover header ── */
+.discover-header {
+  margin-bottom: var(--sp-5);
+}
+
+.discover-header h1 {
+  margin-bottom: var(--sp-3);
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.discover-chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: var(--sp-2);
+}
+
+/* ── Filtered grid view ── */
+.discover-grid-header {
+  margin-bottom: var(--sp-4);
+}
+
+@media (min-width: 480px) {
+  .discover-grid-header { margin-bottom: var(--sp-5); }
+}
+
+.discover-grid-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+@media (min-width: 480px) {
+  .discover-grid-header h2 { font-size: 1.2rem; }
+}
+
+#discover-filtered .btn-show-more {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
