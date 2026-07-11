@@ -203,3 +203,33 @@
 /* ── Section chips (Filters + Movies/TV toggle) ── */
 #home-filters-chip svg { width: 13px; height: 13px; }
 .section-heading .chip-row { flex-wrap: nowrap; }
+
+/* ============================================================
+   ANILIST TRENDING ANIME ROW
+   Sits below the TMDB Trending row. AniList cards reuse the
+   .poster-card layout but with a slightly warmer accent for
+   the "via AniList 🌸" label so users can tell the data source
+   apart at a glance.
+   ============================================================ */
+.anime-trending-section .section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #E8B86D; /* AniList's brand accent — distinguishes from TMDB rows */
+  background: rgba(232, 184, 109, 0.08);
+  border: 1px solid rgba(232, 184, 109, 0.25);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: var(--sp-2);
+}
+
+/* Anime cards reuse poster-card styling. The format badge gets
+   a warm tint to distinguish from TMDB's MOVIE/TV badges. */
+.anime-card .poster-type-badge {
+  background: rgba(232, 184, 109, 0.92);
+  color: #1a1208;
+}
+.anime-card .poster-meta-score {
+  color: #E8B86D; /* score shown in AniList accent */
+}

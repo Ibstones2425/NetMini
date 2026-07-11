@@ -133,6 +133,136 @@
 /* Action buttons */
 .watch-action-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 
+/* ══════════════════════════════════════════
+   ANIME SUB / DUB TOGGLE
+   Visible only on anime titles (watch.js toggles
+   the `hidden` attribute based on isAnime()).
+   Two pill buttons in a segmented-control style.
+══════════════════════════════════════════ */
+.dubsub-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.dubsub-toggle[hidden] { display: none; }
+
+.dubsub-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dubsub-pill-group {
+  display: inline-flex;
+  background: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px;
+}
+
+.dubsub-pill {
+  padding: 7px 18px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  min-height: 32px;
+  letter-spacing: 0.02em;
+}
+.dubsub-pill:hover { color: var(--color-text-primary); }
+.dubsub-pill:active { transform: scale(0.96); }
+.dubsub-pill.active {
+  background: var(--color-accent);
+  color: #FFFFFF;
+}
+
+.dubsub-hint {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+}
+
+/* AniList ID lookup status — tiny line under the toggle */
+.anilist-lookup-status {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin: -8px 0 14px;
+  padding: 0 4px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.anilist-lookup-status[hidden] { display: none; }
+
+/* ── Episode-count-via-AniList badge ── Appears inside the
+   season/episode selector when AniList reports more episodes
+   than TMDB does. AniList's brand accent (#E8B86D) keeps it
+   visually distinct from TMDB-sourced badges. */
+.anilist-ep-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #E8B86D;
+  background: rgba(232, 184, 109, 0.08);
+  border: 1px solid rgba(232, 184, 109, 0.28);
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+.anilist-ep-badge[hidden] { display: none; }
+
+/* ── Dub pill warning state ── When AniList reports dub is
+   likely unavailable, the Dub pill gets an amber outline +
+   pulsing glow so the user knows to expect a possible
+   "no audio" issue. We still allow the click — the user can
+   override the warning — but the visual cue sets expectations. */
+.dubsub-pill.warning {
+  color: #f5a623;
+  border-color: transparent;
+  position: relative;
+}
+.dubsub-pill.warning::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  border: 1.5px dashed rgba(245, 166, 35, 0.6);
+  pointer-events: none;
+  animation: dubWarnPulse 1.6s ease-in-out infinite;
+}
+@keyframes dubWarnPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+.dubsub-pill.warning.active {
+  color: #1a1208;
+  background: #f5a623;
+}
+.dubsub-pill.warning.active::after {
+  border-style: solid;
+  border-color: rgba(26, 18, 8, 0.4);
+  animation: none;
+}
+
 .watch-btn-play {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; background: #fff; color: #000; border: none;
@@ -308,6 +438,58 @@
   gap: 14px; background: #000; transition: opacity 0.45s ease;
 }
 #iframe-loader.hidden { opacity: 0; pointer-events: none; }
+
+/* ── Fallback UI ── Revealed by watch.js when the iframe fails
+   to fire `load` within IFRAME_TIMEOUT_MS (10s). The three
+   buttons give the user clear escape hatches:
+     • Retry            → re-load the same embed URL
+     • Switch Server    → close the player + open server modal
+     • Open in Browser  → launch the embed URL in the system
+                          browser (always works for providers
+                          that block PWA framing). */
+.iframe-loader-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  width: min(280px, 80vw);
+}
+
+.iframe-fallback-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  min-height: var(--tap-min);
+  letter-spacing: -0.01em;
+}
+.iframe-fallback-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: scale(1.02);
+}
+.iframe-fallback-btn:active { transform: scale(0.97); }
+.iframe-fallback-btn.primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+.iframe-fallback-btn.primary:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+.iframe-fallback-btn svg { flex-shrink: 0; }
 
 body.player-open { overflow: hidden; }
 
