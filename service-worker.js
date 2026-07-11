@@ -6,7 +6,7 @@
    Fonts) pass through to the network and are never cached.
    ============================================================ */
 
-const CACHE_VERSION = 'netmini-v1';
+const CACHE_VERSION = 'netmini-v3';
 
 /* Local app-shell assets to precache on install. These are the
    static files that make up the app's UI structure. */
@@ -43,6 +43,7 @@ const PRECACHE_URLS = [
   './js/utils.js',
   './js/nav.js',
   './js/components.js',
+  './js/anilist.js',
   './js/home.js',
   './js/discover.js',
   './js/search.js',
@@ -57,13 +58,19 @@ const PRECACHE_URLS = [
 const NETWORK_ONLY_HOSTS = [
   'api.themoviedb.org',
   'image.tmdb.org',
+  'graphql.anilist.co',
+  'anilist.co',
   'www.youtube.com',
   'youtube.com',
   'i.ytimg.com',
+  'player.cinezo.live',
+  'vidbolt.xyz',
   'vsembed.ru',
   'vidsrc.to',
   'vidsrc.net',
   'vidsrc.xyz',
+  'vidsrc.cc',
+  'www.2embed.cc',
   '2embed.cc',
   'databasegdriveplayer.co',
   'firebasestorage.googleapis.com',
@@ -114,6 +121,10 @@ self.addEventListener('activate', (event) => {
 /* ── FETCH: Network-First, Fallback-to-Cache ──
    - For external hosts (TMDB, video embeds, YouTube): pass
      straight through to the network — do NOT intercept.
+   - For iframe/embed navigations (req.destination === 'iframe'
+     or 'embed'): ALWAYS pass through, even if same-origin, so
+     third-party embed providers never see a service-worker
+     response that would trigger their anti-framing checks.
    - For same-origin local assets (HTML, CSS, JS, images):
      try network first; on failure fall back to cache; on
      total failure, fall back to the cached index.html so the
@@ -128,6 +139,16 @@ self.addEventListener('fetch', (event) => {
   try {
     url = new URL(req.url);
   } catch (e) {
+    return;
+  }
+
+  // ── CRITICAL: never interfere with iframe / embed requests.
+  //    Video embed providers (Cinezo, VidSrc, 2Embed, vsembed…)
+  //    will refuse to render if they receive a synthetic
+  //    service-worker response, and the installed-PWA WebView
+  //    on MIUI / iOS is especially picky about this. Let the
+  //    browser issue these directly to the network.
+  if (req.destination === 'iframe' || req.destination === 'embed') {
     return;
   }
 

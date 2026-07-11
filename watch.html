@@ -89,6 +89,26 @@
           </button>
         </div>
 
+        <!-- ═══════════════════════════════════════
+             ANIME SUB / DUB TOGGLE
+             Visible only when isAnime(detailsData) is true.
+             watch.js calls showDubSubToggle(true) on load.
+             Cinezo's anime endpoint honors ?dub=true — the
+             toggle re-builds the embed URL on every change.
+             ═══════════════════════════════════════ -->
+        <div class="dubsub-toggle" id="dubsub-toggle" hidden>
+          <span class="dubsub-label">Audio:</span>
+          <div class="dubsub-pill-group" role="group" aria-label="Audio language">
+            <button type="button" class="dubsub-pill active" id="dubsub-sub" aria-pressed="true">Sub</button>
+            <button type="button" class="dubsub-pill" id="dubsub-dub" aria-pressed="false">Dub</button>
+          </div>
+          <span class="dubsub-hint">via AniList</span>
+        </div>
+
+        <!-- AniList ID lookup status (shown when Cinezo Anime
+             is resolving the AniList ID before play) -->
+        <div class="anilist-lookup-status" id="anilist-lookup-status" hidden></div>
+
         <!-- TV Season/Episode selector -->
         <div class="watch-episode-selector" id="watch-selector" hidden>
           <div class="watch-selector-row">
@@ -145,6 +165,17 @@
 
   <!-- ═══════════════════════════════════════
        FULLSCREEN PLAYER OVERLAY
+       Iframe attributes tuned for PWA / standalone:
+         • referrerpolicy="no-referrer"  → embed provider can't
+           reject based on parent origin (the #1 cause of "iframe
+           works in browser but blank in installed PWA").
+         • sandbox with explicit permissions → MIUI / iOS WKWebView
+           standalone applies stricter sandboxing than the regular
+           browser tab; listing them explicitly keeps scripts,
+           popups, presentation and same-origin working.
+         • allow (Permissions Policy) → covers everything Cinezo /
+           VidBolt / VidSrc / 2Embed players need to autoplay and
+           enter fullscreen.
   ═══════════════════════════════════════ -->
   <div class="player-overlay" id="player-overlay">
     <!-- Loading state shown while iframe loads -->
@@ -156,6 +187,24 @@
       </div>
       <div class="iframe-loader-logo">NET<span>MINI</span></div>
       <div class="iframe-loader-tip" id="iframe-loader-tip">Starting stream…</div>
+
+      <!-- Fallback actions — revealed by watch.js when the iframe
+           fails to fire its `load` event within IFRAME_TIMEOUT_MS,
+           or when an anime title is auto-routed away from Cinezo. -->
+      <div class="iframe-loader-fallback" id="iframe-loader-fallback" hidden>
+        <button class="iframe-fallback-btn primary" id="iframe-retry-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Retry
+        </button>
+        <button class="iframe-fallback-btn" id="iframe-switch-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/></svg>
+          Switch Server
+        </button>
+        <button class="iframe-fallback-btn" id="iframe-open-external-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open in Browser
+        </button>
+      </div>
     </div>
 
     <iframe
@@ -163,8 +212,9 @@
       id="player-overlay-iframe"
       src=""
       allowfullscreen
-      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write"
-      referrerpolicy="no-referrer-when-downgrade"
+      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write; screen-wake-lock; gamepad; web-share; display-capture"
+      referrerpolicy="no-referrer"
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-pointer-lock allow-modals allow-downloads"
     ></iframe>
 
     <!-- Controls -->
@@ -203,6 +253,7 @@
   <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/components.js"></script>
+  <script src="js/anilist.js"></script>
   <script src="js/watch.js"></script>
 </body>
 </html>
