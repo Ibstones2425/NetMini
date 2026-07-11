@@ -55,6 +55,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
   transition: border-color var(--transition-base), background var(--transition-base), transform var(--transition-fast);
+  min-height: var(--tap-min);
 }
 
 .menu-item:hover,
@@ -65,8 +66,8 @@
 }
 
 .menu-item-icon {
-  width: 42px;
-  height: 42px;
+  width: var(--tap-min);
+  height: var(--tap-min);
   border-radius: var(--radius-md);
   background: #202020;
   display: inline-flex;
@@ -117,7 +118,7 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  min-height: 42px;
+  min-height: var(--tap-min);
   padding: 0 var(--sp-3);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);

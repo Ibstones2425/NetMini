@@ -18,9 +18,10 @@
   background: var(--color-bg-3);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-full);
-  padding: var(--sp-2) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
   transition: border-color var(--transition-base);
   -webkit-tap-highlight-color: transparent;
+  min-height: var(--tap-min);
 }
 
 @media (min-width: 480px) {

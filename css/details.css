@@ -59,13 +59,13 @@
 .details-back-btn,
 .details-playlist-btn {
   position: absolute;
-  top: var(--sp-3);
+  top: calc(var(--sp-3) + var(--safe-area-top));
   z-index: 10;
   background: rgba(0,0,0,0.6);
   border: none;
   color: #fff;
-  width: 36px;
-  height: 36px;
+  width: var(--tap-min);
+  height: var(--tap-min);
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -73,6 +73,8 @@
   cursor: pointer;
   transition: background var(--transition-base), transform var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .details-back-btn { left: var(--sp-3); }
@@ -80,9 +82,9 @@
 
 @media (min-width: 480px) {
   .details-back-btn, .details-playlist-btn {
-    top: var(--sp-4);
-    width: 40px;
-    height: 40px;
+    top: calc(var(--sp-4) + var(--safe-area-top));
+    width: 48px;
+    height: 48px;
   }
   .details-back-btn { left: var(--sp-4); }
   .details-playlist-btn { right: var(--sp-4); }
@@ -490,4 +492,72 @@
 
 @media (min-width: 480px) {
   .details-similar-section { padding: 0 var(--sp-4); margin-bottom: var(--sp-8); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   INLINE TRAILER (YouTube iframe overlay on backdrop hero)
+   The iframe inherits the hero's 16/9 aspect ratio and sits
+   beneath the existing gradient overlay (::after) and the
+   back/playlist buttons.
+   ════════════════════════════════════════════════════════════ */
+
+.details-trailer-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  object-fit: cover;
+  /* Scale slightly wider than the container to hide YouTube UI
+     chrome (title, logo, etc.) that lingers at the edges. */
+  transform: scale(1.06);
+  transform-origin: center center;
+  pointer-events: none;
+  z-index: 1;
+  /* Use the same fade-in as the backdrop image */
+  opacity: 0;
+  animation: detailsTrailerFadeIn 0.6s ease 0.15s forwards;
+}
+
+@keyframes detailsTrailerFadeIn {
+  to { opacity: 1; }
+}
+
+/* Hide the backdrop <img> when the trailer takes over */
+.details-trailer-hidden {
+  opacity: 0 !important;
+  transition: opacity 0.4s ease;
+}
+
+/* Small "Trailer" badge — bottom-left of hero, above the gradient */
+.details-trailer-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .details-trailer-badge {
+    bottom: 18px;
+    left: 18px;
+    font-size: 0.7rem;
+    padding: 5px 12px;
+  }
 }

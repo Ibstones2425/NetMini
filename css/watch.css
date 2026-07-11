@@ -33,8 +33,8 @@
 
 /* Back button */
 .watch-hero-back {
-  position: absolute; top: 14px; left: 14px; z-index: 10;
-  width: 36px; height: 36px; border-radius: 50%;
+  position: absolute; top: calc(14px + var(--safe-area-top)); left: 14px; z-index: 10;
+  width: var(--tap-min); height: var(--tap-min); border-radius: 50%;
   background: rgba(0,0,0,0.55); border: 1.5px solid rgba(255,255,255,0.18);
   display: flex; align-items: center; justify-content: center; color: #fff;
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
@@ -73,7 +73,7 @@
 
 /* Circular play button */
 .watch-hero-play-btn {
-  width: 54px; height: 54px; border-radius: 50%;
+  width: 60px; height: 60px; border-radius: 50%;
   background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.65); color: #fff;
   display: flex; align-items: center; justify-content: center;
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -137,8 +137,9 @@
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; background: #fff; color: #000; border: none;
   border-radius: var(--radius-md); font-size: 0.97rem; font-weight: 800;
-  padding: 13px 0; cursor: pointer; letter-spacing: 0.01em;
+  padding: 14px 0; cursor: pointer; letter-spacing: 0.01em;
   transition: opacity 0.15s; -webkit-tap-highlight-color: transparent;
+  min-height: var(--tap-min);
 }
 .watch-btn-play:active { opacity: 0.82; }
 
@@ -146,8 +147,9 @@
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; background: #1e1e1e; color: #fff; border: 1px solid #333;
   border-radius: var(--radius-md); font-size: 0.97rem; font-weight: 700;
-  padding: 13px 0; cursor: pointer;
+  padding: 14px 0; cursor: pointer;
   transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+  min-height: var(--tap-min);
 }
 .watch-btn-servers:active { background: #2a2a2a; }
 .watch-btn-servers svg { stroke: var(--color-text-secondary); }
@@ -157,8 +159,9 @@
   display: flex; align-items: center; justify-content: center; gap: 6px;
   background: var(--color-accent); color: #fff; border: none;
   border-radius: var(--radius-md); font-size: 0.82rem; font-weight: 700;
-  padding: 9px 16px; cursor: pointer; white-space: nowrap;
+  padding: 11px 18px; cursor: pointer; white-space: nowrap;
   transition: background 0.15s; -webkit-tap-highlight-color: transparent;
+  min-height: var(--tap-min);
 }
 .watch-btn-ep-play:active { background: #c10812; }
 
@@ -199,8 +202,8 @@
   display: flex; flex-direction: column; align-items: center; gap: 5px;
   background: none; border: none; color: var(--color-text-secondary);
   font-size: 0.62rem; font-weight: 500; letter-spacing: 0.01em;
-  cursor: pointer; padding: 2px 6px; -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s; min-width: 48px;
+  cursor: pointer; padding: 6px 10px; -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s; min-width: var(--tap-min); min-height: var(--tap-min);
 }
 .watch-util-btn:active { color: #fff; }
 
@@ -212,6 +215,53 @@
 }
 .player-overlay.active { display: flex; align-items: center; justify-content: center; }
 
+/* ── Smart CSS-based forced landscape ──
+   Applied by watch.js ONLY when the device is in portrait mode
+   (window.innerHeight > window.innerWidth). We deliberately
+   avoid the native Screen Orientation API because third-party
+   embed providers (Cinezo, VidBolt, VidSrc, 2Embed, etc.) often
+   have anti-hijack protection that crashes the iframe when an
+   orientation lock is attempted from a cross-origin parent.
+
+   The transform rotates the entire overlay 90° clockwise so the
+   iframe content appears in landscape to the user, while the
+   device itself remains in portrait — no permission prompt, no
+   security error, no iframe crash. */
+.player-overlay.force-landscape {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vh;
+  height: 100vw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center center;
+  z-index: 99999;
+}
+
+/* When force-landscape is active, rotate the close button + server
+   chip back to upright so they remain readable to the user. */
+.player-overlay.force-landscape .player-overlay-controls {
+  transform: rotate(-90deg);
+  transform-origin: top right;
+  /* Re-anchor: controls bar appears along the right edge of the
+     rotated landscape viewport. */
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: 100vw;
+  height: 56px;
+  flex-direction: row-reverse;
+  padding: 0 16px;
+  background: linear-gradient(to left, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+.player-overlay.force-landscape .player-overlay-iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Legacy class retained for backward-compat — same behaviour as force-landscape */
 .player-overlay.landscape-fallback {
   transform: translate(-50%, -50%) rotate(90deg);
   width: 100vh; height: 100vw; left: 50%; top: 50%;
@@ -233,7 +283,7 @@
 .player-overlay-controls > * { pointer-events: all; }
 
 .player-overlay-close {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: var(--tap-min); height: var(--tap-min); border-radius: 50%;
   background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.25);
   color: #fff; display: flex; align-items: center; justify-content: center;
   cursor: pointer; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);

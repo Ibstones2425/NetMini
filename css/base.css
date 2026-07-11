@@ -10,6 +10,19 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* ── 320px tiny phone support ── */
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+}
+
+/* ── Safe-area helpers for notched devices ── */
+:root {
+  --safe-area-top:    env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left:   env(safe-area-inset-left, 0px);
+  --safe-area-right:  env(safe-area-inset-right, 0px);
+}
+
 body {
   font-family: var(--font-body);
   background: var(--color-bg);
@@ -69,8 +82,11 @@ input, select { font-family: inherit; font-size: inherit; }
   --transition-slow: 300ms ease;
 
   --sidebar-width:     200px;
-  --bottom-bar-height: 58px;
+  --bottom-bar-height: 62px;
   --content-max-width: 1400px;
+
+  /* Touch target minimum (Apple/Google guideline) */
+  --tap-min: 44px;
 }
 
 /* ── Typography ── */
