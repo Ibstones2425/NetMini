@@ -286,6 +286,18 @@
 
   /* ══════════════════════════════════════════
      PLAYER — OPEN / CLOSE
+
+     Smart landscape strategy (anti-iframe-crash):
+       • Detect portrait mode (innerHeight > innerWidth).
+       • If portrait → apply `.force-landscape` CSS class to rotate
+         the overlay 90° via CSS transform. NO native orientation
+         lock is ever called, because cross-origin iframes from
+         third-party providers (Cinezo, VidBolt, VidSrc, 2Embed…)
+         often have anti-hijack protection that crashes when the
+         parent attempts `screen.orientation.lock('landscape')`.
+       • If already landscape → no rotation needed.
+       • Re-evaluate on resize / orientationchange so the user can
+         freely rotate their device; we just follow.
   ══════════════════════════════════════════ */
   function openPlayer() {
     if (!mediaId) return;
@@ -305,31 +317,67 @@
     /* Push history so back-button closes overlay */
     window.history.pushState({ playerOpen: true }, '');
 
-    /* Request fullscreen */
+    /* Apply CSS-based landscape rotation if needed (no native API) */
+    applySmartLandscape();
+
+    /* On desktop (non-touch), also request native fullscreen for a
+       cleaner viewing experience. On touch devices, we rely purely
+       on CSS rotation to avoid iframe anti-hijack crashes. */
     tryFullscreen(elOverlay);
+
+    /* Listen for orientation changes while player is open */
+    window.addEventListener('resize',        onViewportChange);
+    window.addEventListener('orientationchange', onViewportChange);
   }
 
   function closePlayer() {
     elOverlayIframe.src = '';             /* kill audio/stream immediately */
-    elOverlay.classList.remove('active', 'landscape-fallback');
+    elOverlay.classList.remove('active', 'force-landscape', 'landscape-fallback');
     document.body.classList.remove('player-open');
     playerOpen = false;
     hideIframeLoader();
 
-    /* Unlock orientation */
-    try { if (screen.orientation?.unlock) screen.orientation.unlock(); } catch (_) {}
+    /* Stop listening to orientation changes */
+    window.removeEventListener('resize',        onViewportChange);
+    window.removeEventListener('orientationchange', onViewportChange);
 
-    /* Exit native FS */
-    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
-    if (exit && document.fullscreenElement) exit.call(document).catch(() => {});
+    /* Exit native fullscreen on desktop if we entered it.
+       (Mobile never enters native FS — uses CSS rotation only.) */
+    if (_inNativeFS) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+      if (exit && document.fullscreenElement) {
+        exit.call(document).catch(() => {});
+      }
+      _inNativeFS = false;
+    }
   }
 
+  /* ── Smart landscape helper ──
+     Applies `.force-landscape` only when device is in portrait.
+     Never calls screen.orientation.lock — that's the whole point. */
+  function applySmartLandscape() {
+    if (!playerOpen) return;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    if (isPortrait) {
+      elOverlay.classList.add('force-landscape');
+    } else {
+      elOverlay.classList.remove('force-landscape');
+    }
+  }
+
+  function onViewportChange() {
+    applySmartLandscape();
+  }
+
+  /* Fullscreen change handler — kept for the rare case where a
+     desktop user manually toggles native fullscreen; we don't
+     initiate it ourselves on mobile to avoid iframe crashes. */
   function onFullscreenChange() {
     const inFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    /* Only close if we actually entered native FS (not a failed attempt) */
     if (!inFS && _inNativeFS && playerOpen) {
       _inNativeFS = false;
-      closePlayer();
+      /* Don't auto-close on mobile — that would fight the user.
+         Only close if we explicitly entered native FS (desktop). */
     }
     if (!inFS) _inNativeFS = false;
   }
@@ -338,22 +386,33 @@
      onFullscreenChange doesn't close the player on a failed attempt. */
   let _inNativeFS = false;
 
+  /* tryFullscreen is now a no-op on mobile. On desktop (≥1024px or
+     non-touch), we still attempt native fullscreen for a cleaner
+     viewing experience — desktop iframes don't have the same
+     anti-hijack issues as mobile. */
   function tryFullscreen(el) {
+    /* Skip native fullscreen entirely on touch devices — pure CSS
+       rotation handles landscape on mobile. */
+    const isTouchDevice = (
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0
+    );
+    if (isTouchDevice) {
+      _inNativeFS = false;
+      return;
+    }
+
     const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
     if (req) {
       req.call(el).then(() => {
         _inNativeFS = true;
-        try {
-          if (screen.orientation?.lock) screen.orientation.lock('landscape').catch(() => {});
-        } catch (_) {}
       }).catch(() => {
-        /* Fullscreen refused (policy, gesture missing, etc.) — stay open in CSS fallback */
+        /* Fullscreen refused — CSS fallback already applied via
+           applySmartLandscape if portrait. */
         _inNativeFS = false;
-        el.classList.add('landscape-fallback');
       });
     } else {
       _inNativeFS = false;
-      el.classList.add('landscape-fallback');
     }
   }
 

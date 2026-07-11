@@ -140,3 +140,8 @@ async function getCredits(type, id) {
 async function getSimilar(type, id, page = 1) {
   return tmdbFetch(`/${type}/${id}/similar`, { page });
 }
+
+/* ── Videos (trailers, teasers, clips) — movie or tv ── */
+async function getVideos(type, id) {
+  return tmdbFetch(`/${type}/${id}/videos`);
+}

@@ -34,6 +34,8 @@
     document.getElementById("playlist-btn").addEventListener("click", togglePlaylistHandler);
 
     await loadDetails();
+    // Delay trailer fetch by 2s so primary content paints first
+    setTimeout(loadInlineTrailer, 2000);
   }
 
   async function loadDetails() {
@@ -352,5 +354,77 @@
       ? '<path d="M6 3h12v18l-6-4-6 4z" fill="currentColor" stroke="currentColor"/>'
       : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
     btn.setAttribute("aria-label", isSaved ? "Remove from playlist" : "Add to playlist");
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     INLINE TRAILER (YouTube iframe over backdrop hero)
+     Fetches /videos endpoint 2s after page load, finds the best
+     official Trailer/Teaser on YouTube, and overlays a muted,
+     looping, autoplaying iframe on top of the backdrop image.
+     Preserves the existing aspect ratio and edge-fade gradient.
+     ════════════════════════════════════════════════════════════ */
+  async function loadInlineTrailer() {
+    if (!type || !id) return;
+
+    const { data, error } = await getVideos(type, id);
+    if (error || !data || !data.results || !data.results.length) return;
+
+    const videos = data.results.filter(v => v.site === "YouTube" && v.key);
+    if (!videos.length) return;
+
+    // Priority: Official Trailer > Official Teaser > any Trailer > any Teaser > any Clip
+    const pick =
+      videos.find(v => v.official && v.type === "Trailer") ||
+      videos.find(v => v.official && v.type === "Teaser")    ||
+      videos.find(v => v.type === "Trailer")                 ||
+      videos.find(v => v.type === "Teaser")                  ||
+      videos.find(v => v.type === "Clip")                    ||
+      videos[0];
+
+    if (!pick || !pick.key) return;
+
+    const hero      = document.getElementById("details-hero");
+    const skeleton  = document.getElementById("hero-skeleton");
+    if (!hero) return;
+
+    // Hide any existing backdrop <img> and skeleton behind the iframe
+    const existingImg = hero.querySelector("img:not(.details-trailer-iframe)");
+    if (existingImg) existingImg.classList.add("details-trailer-hidden");
+
+    if (skeleton) skeleton.style.display = "none";
+
+    // Build the YouTube embed URL
+    // - autoplay=1, mute=1 → satisfies browser autoplay policy
+    // - loop=1 + playlist=<key> → true loop
+    // - controls=0, modestbranding=1, rel=0 → clean UI
+    // - playsinline=1 → prevent iOS fullscreen takeover
+    // - iv_load_policy=3 → hide annotations
+    const videoKey = pick.key;
+    const embedSrc = `https://www.youtube.com/embed/${videoKey}` +
+                     `?autoplay=1&mute=1&loop=1&playlist=${videoKey}` +
+                     `&controls=0&modestbranding=1&rel=0&playsinline=1` +
+                     `&iv_load_policy=3&showinfo=0&fs=0&disablekb=1`;
+
+    const iframe = document.createElement("iframe");
+    iframe.className = "details-trailer-iframe";
+    iframe.src = embedSrc;
+    iframe.title = `${getTitle(detailsData || {})} — Trailer`;
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+    iframe.setAttribute("allowfullscreen", "false");
+    iframe.setAttribute("tabindex", "-1");
+    iframe.setAttribute("aria-hidden", "true");
+
+    // Insert iframe as the first child so it sits beneath the
+    // gradient overlay (::after) and the back/playlist buttons.
+    hero.insertBefore(iframe, hero.firstChild);
+
+    // Add a tiny "Trailer" badge so the user knows it's playing
+    if (!hero.querySelector(".details-trailer-badge")) {
+      const badge = document.createElement("div");
+      badge.className = "details-trailer-badge";
+      badge.textContent = "▶ Trailer";
+      hero.appendChild(badge);
+    }
   }
 })();
