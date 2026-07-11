@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetMini — Home</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script src="js/splash.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-content">
+      <!-- Mobile wordmark -->
+      <div class="mobile-wordmark">NET<span>MINI</span></div>
+
+      <div class="page-inner">
+
+        <!-- ① Netflix-style hero banner -->
+        <section id="hero-section">
+          <div class="hero-skeleton skeleton" id="hero-skeleton"></div>
+        </section>
+
+        <!-- ② Page heading + filter chips -->
+        <header class="home-header">
+          <h1>Discover</h1>
+          <div class="chip-row" id="home-top-chips">
+            <button class="chip" id="home-filters-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="9" cy="18" r="2" fill="currentColor"/></svg>
+              <span>Filters</span>
+            </button>
+            <button class="chip active" data-type-toggle="movie">Movies</button>
+            <button class="chip" data-type-toggle="tv">TV Shows</button>
+          </div>
+        </header>
+
+        <!-- ③ Watch History (hidden until there is history) -->
+        <section class="content-section" id="watch-history-section" hidden>
+          <div class="section-heading">
+            <h2 class="section-title">Continue Watching</h2>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="watch-history-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ④ Trending -->
+        <section class="content-section" id="trending-section">
+          <div class="section-heading">
+            <h2 class="section-title">Trending</h2>
+            <div class="chip-row" id="trending-chips">
+              <button class="chip active" data-type-toggle="movie">Movies</button>
+              <button class="chip" data-type-toggle="tv">TV Shows</button>
+            </div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="trending-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑤ Top 10 -->
+        <section class="content-section" id="top-ten-section">
+          <div class="section-heading">
+            <h2 class="section-title">Top 10</h2>
+            <div class="chip-row" id="top-ten-chips">
+              <button class="chip active" data-type-toggle="movie">Movies</button>
+              <button class="chip" data-type-toggle="tv">TV Shows</button>
+            </div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="top-ten-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑥ Streaming (by provider) -->
+        <section class="content-section" id="streaming-section">
+          <div class="section-heading">
+            <h2 class="section-title">Streaming</h2>
+            <div class="section-label">TV SHOWS</div>
+          </div>
+          <div class="chip-row" id="streaming-chips"></div>
+          <div class="content-row-wrapper" style="margin-top:10px">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="streaming-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑦ Network Productions -->
+        <section class="content-section" id="network-section">
+          <div class="section-heading">
+            <h2 class="section-title">Network Productions</h2>
+            <div class="section-label">TV SHOWS</div>
+          </div>
+          <div class="chip-row" id="network-chips"></div>
+          <div class="content-row-wrapper" style="margin-top:10px">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="network-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑧ Now Playing -->
+        <section class="content-section" id="now-playing-section">
+          <div class="section-heading">
+            <h2 class="section-title">Now Playing</h2>
+            <div class="section-label">MOVIES</div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="now-playing-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑨ Upcoming -->
+        <section class="content-section" id="upcoming-section">
+          <div class="section-heading">
+            <h2 class="section-title">Upcoming</h2>
+            <div class="section-label">MOVIES</div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="upcoming-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑩ Popular -->
+        <section class="content-section" id="popular-section">
+          <div class="section-heading">
+            <h2 class="section-title">Popular</h2>
+            <div class="chip-row" id="popular-chips">
+              <button class="chip active" data-type-toggle="movie">Movies</button>
+              <button class="chip" data-type-toggle="tv">TV Shows</button>
+            </div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="popular-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑪ Top Rated -->
+        <section class="content-section" id="top-rated-section">
+          <div class="section-heading">
+            <h2 class="section-title">Top Rated</h2>
+            <div class="chip-row" id="top-rated-chips">
+              <button class="chip active" data-type-toggle="movie">Movies</button>
+              <button class="chip" data-type-toggle="tv">TV Shows</button>
+            </div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="top-rated-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑫ Genres -->
+        <section class="content-section" id="genres-section">
+          <div class="section-heading">
+            <h2 class="section-title">Genres</h2>
+            <div class="chip-row" id="genres-chips">
+              <button class="chip active" data-type-toggle="movie">Movies</button>
+              <button class="chip" data-type-toggle="tv">TV Shows</button>
+            </div>
+          </div>
+          <div class="chip-row" id="genre-list" style="margin-top:8px"></div>
+        </section>
+
+        <!-- ⑬ Airing Today -->
+        <section class="content-section" id="airing-today-section">
+          <div class="section-heading">
+            <h2 class="section-title">Airing Today</h2>
+            <div class="section-label">TV SHOWS</div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="airing-today-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+        <!-- ⑭ On TV -->
+        <section class="content-section" id="on-tv-section">
+          <div class="section-heading">
+            <h2 class="section-title">On TV</h2>
+            <div class="section-label">TV SHOWS</div>
+          </div>
+          <div class="content-row-wrapper">
+            <button class="row-arrow left" aria-label="Scroll left"></button>
+            <div class="content-row" id="on-tv-row"></div>
+            <button class="row-arrow right" aria-label="Scroll right"></button>
+          </div>
+        </section>
+
+      </div><!-- /page-inner -->
+    </main>
+  </div>
+
+  <!-- Bottom tab bar (mobile) -->
+  <nav id="bottom-bar" class="bottom-bar"></nav>
+  <div id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>
