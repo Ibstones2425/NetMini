@@ -2,20 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NetMini — Home</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#141414">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="NetMini">
-  <link rel="icon" type="image/png" href="favicon-32.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/home.css">
   <script src="js/splash.js" defer></script>
-  <script src="js/pwa.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -69,27 +61,6 @@
           <div class="content-row-wrapper">
             <button class="row-arrow left" aria-label="Scroll left"></button>
             <div class="content-row" id="trending-row"></div>
-            <button class="row-arrow right" aria-label="Scroll right"></button>
-          </div>
-        </section>
-
-        <!-- ④b Trending Anime (AniList TRENDING_DESC — decoupled from TMDB) -->
-        <section class="content-section anime-trending-section" id="anime-trending-section">
-          <div class="section-heading">
-            <h2 class="section-title">Trending Anime</h2>
-            <span class="section-label">via AniList 🌸</span>
-          </div>
-          <div class="content-row-wrapper">
-            <button class="row-arrow left" aria-label="Scroll left"></button>
-            <div class="content-row" id="anime-trending-row">
-              <!-- Skeleton placeholders get filled by home.js loadTrendingAnime() -->
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-              <div class="poster-card"><div class="skeleton skeleton-poster"></div><div class="skeleton skeleton-text" style="width:80%"></div></div>
-            </div>
             <button class="row-arrow right" aria-label="Scroll right"></button>
           </div>
         </section>
@@ -247,7 +218,6 @@
   <script src="js/utils.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/components.js"></script>
-  <script src="js/anilist.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>
