@@ -34,7 +34,7 @@
   ];
 
   const GENRES_LIST = [
-    'Action','Adventure','Animation','Comedy','Crime','Drama',
+    'Action','Adventure','Comedy','Crime','Drama',
     'Family','Fantasy','Horror','Romance','Science Fiction','War','Western'
   ];
 
@@ -86,9 +86,10 @@
       document.getElementById('hero-section').style.display = 'none';
       return;
     }
-    /* pick top 5 that have backdrops */
+    /* pick top 5 that have backdrops, skipping anime (in-development) */
     state.heroItems = data.results
       .filter(i => i.backdrop_path && i.media_type !== 'person')
+      .filter(i => !isAnimeItem(i))
       .slice(0, 5);
     renderHero(0);
   }
@@ -114,8 +115,11 @@
     if (year)   metaParts.push(`<span class="meta-sep">•</span><span>${year}</span>`);
     if (type)   metaParts.push(`<span class="meta-sep">•</span><span>${type === 'tv' ? 'TV Show' : 'Movie'}</span>`);
 
+    /* Netflix-style Play + More Info buttons.
+       - Play: white bg, dark text, crisp play icon, hover scale.
+       - More Info: semitransparent gray bg, white text, info icon. */
     section.innerHTML = `
-      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager">
+      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager" onload="this.classList.add('loaded')">
       <div class="hero-gradient"></div>
       <div class="hero-info">
         <div class="hero-badge">Trending Today</div>
@@ -123,10 +127,10 @@
         <div class="hero-meta">${metaParts.join('')}</div>
         <div class="hero-desc">${escapeHtml(item.overview || '')}</div>
         <div class="hero-btns">
-          <a class="btn-primary" href="watch.html?type=${type}&id=${item.id}">
-            ${ICONS.play} Watch Now
+          <a class="btn-play-nf" href="watch.html?type=${type}&id=${item.id}">
+            ${ICONS.play} Play
           </a>
-          <a class="btn-secondary" href="details.html?type=${type}&id=${item.id}">
+          <a class="btn-info-nf" href="details.html?type=${type}&id=${item.id}">
             ${ICONS.info} More Info
           </a>
         </div>
@@ -205,6 +209,7 @@
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
     row.innerHTML = data.results
       .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: state.trendingType }))
       .join('');
     attachRowArrows();
@@ -218,6 +223,7 @@
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
     row.innerHTML = data.results
       .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .slice(0, 10)
       .map((item, index) => renderTopTenCard(item, index + 1, { type: state.topTenType }))
       .join('');
@@ -245,7 +251,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getDiscoverByProvider('tv', state.activeProvider);
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'tv' })).join('');
     attachRowArrows();
   }
@@ -271,7 +279,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getDiscoverByNetwork(state.activeNetwork);
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'tv' })).join('');
     attachRowArrows();
   }
@@ -282,7 +292,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getNowPlaying();
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'movie' })).join('');
     attachRowArrows();
   }
@@ -293,7 +305,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getUpcoming();
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'movie' })).join('');
     attachRowArrows();
   }
@@ -304,7 +318,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getPopular(state.popularType);
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: state.popularType })).join('');
     attachRowArrows();
   }
@@ -315,7 +331,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getTopRated(state.topRatedType);
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: state.topRatedType })).join('');
     attachRowArrows();
   }
@@ -346,7 +364,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getAiringToday();
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'tv' })).join('');
     attachRowArrows();
   }
@@ -357,7 +377,9 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getOnTheAir();
     if (error || !data?.results) { row.innerHTML = errorHtml(); return; }
-    row.innerHTML = data.results.filter(i => i.poster_path)
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
       .map(i => renderPosterCard(i, { type: 'tv' })).join('');
     attachRowArrows();
   }

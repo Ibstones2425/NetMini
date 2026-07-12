@@ -270,12 +270,15 @@
       return;
     }
     // Render genre chips inside the grid area
+    // (Animation is hidden — anime experience is in development)
     const grid = document.getElementById("filtered-grid");
     grid.innerHTML = `
       <div style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-        ${data.genres.map((g) =>
-          renderChip(g.name, { dataKey: "genreid", dataValue: g.id })
-        ).join("")}
+        ${data.genres
+          .filter((g) => g.id !== 16)   /* drop Animation */
+          .map((g) =>
+            renderChip(g.name, { dataKey: "genreid", dataValue: g.id })
+          ).join("")}
       </div>`;
     grid.querySelectorAll("[data-genreid]").forEach((chip) => {
       chip.addEventListener("click", () => {
@@ -312,7 +315,9 @@
       showMore.style.display = "none";
       return;
     }
-    const items = data.results.filter((i) => i.poster_path);
+    const items = data.results
+      .filter((i) => i.poster_path)
+      .filter((i) => !isAnimeItem(i));   /* hide anime (in-development) */
     state.filteredResults = state.filteredResults.concat(items);
     grid.innerHTML = state.filteredResults
       .map((i) => renderPosterCard(i, { type: opts.type || state.filteredType }))
@@ -391,6 +396,7 @@
     if (error || !data) return;
     row.innerHTML = data.results
       .filter((i) => i.media_type !== "person")
+      .filter((i) => !isAnimeItem(i))   /* hide anime (in-development) */
       .map((i) => renderPosterCard(i, { type: state.trendingType }))
       .join("");
     attachRowArrows();
@@ -417,7 +423,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getDiscoverByProvider("tv", state.activeProvider);
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "tv" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "tv" })).join("");
     attachRowArrows();
     
   }
@@ -442,7 +451,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getDiscoverByNetwork(state.activeNetwork);
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "tv" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "tv" })).join("");
     attachRowArrows();
     
   }
@@ -452,7 +464,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getNowPlaying();
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "movie" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "movie" })).join("");
     attachRowArrows();
     
   }
@@ -462,7 +477,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getUpcoming();
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "movie" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "movie" })).join("");
     attachRowArrows();
     
   }
@@ -472,7 +490,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getPopular(state.popularType);
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: state.popularType })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: state.popularType })).join("");
     attachRowArrows();
     
   }
@@ -482,7 +503,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getTopRated(state.topRatedType);
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: state.topRatedType })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: state.topRatedType })).join("");
     attachRowArrows();
     
   }
@@ -502,7 +526,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getAiringToday();
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "tv" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "tv" })).join("");
     attachRowArrows();
     
   }
@@ -512,7 +539,10 @@
     row.innerHTML = skeletonRowCards(8);
     const { data, error } = await getOnTheAir();
     if (error || !data) return;
-    row.innerHTML = data.results.filter(i => i.poster_path).map((i) => renderPosterCard(i, { type: "tv" })).join("");
+    row.innerHTML = data.results
+      .filter(i => i.poster_path)
+      .filter(i => !isAnimeItem(i))   /* hide anime (in-development) */
+      .map((i) => renderPosterCard(i, { type: "tv" })).join("");
     attachRowArrows();
     
   }

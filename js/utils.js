@@ -252,3 +252,67 @@ function showToast(msg, duration = 2500) {
   clearTimeout(t._hideTimer);
   t._hideTimer = setTimeout(() => t.classList.remove('show'), duration);
 }
+
+/* ════════════════════════════════════════════════════════════
+   ANIME DETECTION (shared across pages)
+   NetMini's anime experience is in development. Anime titles
+   are hidden from all browse surfaces (home rows, discover rows,
+   search results) and the watch page shows an "anime app in
+   development" message instead of opening the player.
+
+   Two TMDB shapes are supported:
+     • /search/multi, /trending, /popular, /top_rated, etc.
+       return `genre_ids` (flat array of numbers) — no `genres`.
+     • /movie/{id}, /tv/{id} (used by details + watch)
+       return `genres` (array of {id, name} objects).
+
+   Heuristics (any one is enough):
+     1) original_language === 'ja' AND Animation genre present
+     2) Production country JP AND Animation genre present
+        (only available on the full details shape)
+     3) Title contains obvious anime markers
+        ('anime', 'otaku', 'shounen', 'shoujo', 'isekai', 'mecha')
+     4) TV + Animation genre + episode_run_time <= 30
+        (only available on the full details shape — catches
+        Japanese-style anime that TMDB has tagged with a non-ja
+        original language)
+   ════════════════════════════════════════════════════════════ */
+function isAnimeItem(item) {
+  if (!item) return false;
+  const ANIMATION_ID = 16;
+  const ANIME_TERMS  = ['anime','otaku','shounen','shoujo','isekai','mecha'];
+
+  /* Both shapes have original_language */
+  const isJa = (item.original_language || '').toLowerCase() === 'ja';
+
+  /* genre_ids (search/trending shape) — flat array of numbers */
+  const genreIds = Array.isArray(item.genre_ids) ? item.genre_ids : [];
+  /* genres (details shape) — array of {id, name} */
+  const genres   = Array.isArray(item.genres)    ? item.genres    : [];
+
+  const hasAnim =
+    genreIds.some(g => g === ANIMATION_ID) ||
+    genres.some(g => g.id === ANIMATION_ID);
+
+  if (isJa && hasAnim) return true;
+
+  /* Production country check (details shape only) */
+  const fromJapan = (item.production_countries || []).some(c =>
+    (c.iso_3166_1 || '').toUpperCase() === 'JP' ||
+    (c.name || '').toLowerCase().includes('japan')
+  );
+  if (fromJapan && hasAnim) return true;
+
+  /* Title keyword check */
+  const title = (item.title || item.name ||
+                 item.original_title || item.original_name || '').toLowerCase();
+  if (ANIME_TERMS.some(t => title.includes(t))) return true;
+
+  /* Short-episode TV animation (details shape only) */
+  if (item.first_air_date && hasAnim &&
+      (item.episode_run_time || []).some(t => t && t <= 30)) {
+    return true;
+  }
+
+  return false;
+}

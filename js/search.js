@@ -58,7 +58,10 @@
     // Filter out results without posters and non-media types
     const items = data.results.filter((i) => {
       if (i.media_type === "person") return false;
-      return i.poster_path;
+      if (!i.poster_path) return false;
+      // Hide anime (in-development). Shared helper in utils.js.
+      if (isAnimeItem(i)) return false;
+      return true;
     });
     state.results = state.results.concat(items);
     state.totalPages = data.total_pages;
