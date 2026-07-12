@@ -121,16 +121,9 @@ async function searchMulti(query, page = 1) {
   return tmdbFetch(`/search/multi`, { query, page, include_adult: "false" });
 }
 
-/* ── Details (movie or tv) ──
-   append_to_response pulls credits, similar titles, age-rating
-   sources (release_dates for movies, content_ratings for TV),
-   and keywords in a single request so the details page can
-   render the Netflix popup-canvas metadata block without any
-   extra round-trips. */
+/* ── Details (movie or tv) ── */
 async function getDetails(type, id) {
-  return tmdbFetch(`/${type}/${id}`, {
-    append_to_response: "credits,similar,release_dates,content_ratings,keywords"
-  });
+  return tmdbFetch(`/${type}/${id}`, { append_to_response: "credits,similar" });
 }
 
 /* ── Season details (TV only) ── */

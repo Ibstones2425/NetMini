@@ -67,7 +67,6 @@
     /* Fire all data loads in parallel */
     await loadHero();          /* hero first so it's visible quickly */
     loadTrending();
-    loadTrendingAnime();       /* AniList TRENDING_DESC — independent of TMDB */
     loadTopTen();
     loadStreaming();
     loadNetwork();
@@ -78,31 +77,6 @@
     loadGenres();
     loadAiringToday();
     loadOnTV();
-  }
-
-  /* ── Trending Anime (AniList) ──
-     Fetches top 20 trending anime from AniList and renders them
-     using renderAnimeCard(). Card clicks resolve the TMDB id via
-     findTmdbIdFromAnilistTitle() and redirect to details.html.
-     Independent of TMDB's catalog — surfaces anime that may not
-     even appear in TMDB's trending feeds. */
-  async function loadTrendingAnime() {
-    const row = document.getElementById('anime-trending-row');
-    if (!row) return;
-    // Skeletons are pre-rendered in HTML — replace on success
-    const items = await getAniListTrending(20);
-    if (!items || !items.length) {
-      // Hide the whole section if AniList is unreachable
-      const section = document.getElementById('anime-trending-section');
-      if (section) section.style.display = 'none';
-      return;
-    }
-    row.innerHTML = items.map(item => renderAnimeCard(item)).join('');
-    attachRowArrows();
-    // Wire up the card clicks → TMDB title search → details.html
-    if (typeof attachAnimeCardClicks === 'function') {
-      attachAnimeCardClicks(row);
-    }
   }
 
   /* ── HERO BANNER ──────────────────────────────────────────── */
@@ -140,11 +114,8 @@
     if (year)   metaParts.push(`<span class="meta-sep">•</span><span>${year}</span>`);
     if (type)   metaParts.push(`<span class="meta-sep">•</span><span>${type === 'tv' ? 'TV Show' : 'Movie'}</span>`);
 
-    /* Netflix-style Play + More Info buttons.
-       - Play: white bg, dark text, crisp play icon, hover scale.
-       - More Info: semitransparent gray bg, white text, info icon. */
     section.innerHTML = `
-      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager" onload="this.classList.add('loaded')">
+      <img class="hero-backdrop" src="${backSrc}" alt="${escapeHtml(title)}" loading="eager">
       <div class="hero-gradient"></div>
       <div class="hero-info">
         <div class="hero-badge">Trending Today</div>
@@ -152,10 +123,10 @@
         <div class="hero-meta">${metaParts.join('')}</div>
         <div class="hero-desc">${escapeHtml(item.overview || '')}</div>
         <div class="hero-btns">
-          <a class="btn-play-nf" href="watch.html?type=${type}&id=${item.id}">
-            ${ICONS.play} Play
+          <a class="btn-primary" href="watch.html?type=${type}&id=${item.id}">
+            ${ICONS.play} Watch Now
           </a>
-          <a class="btn-info-nf" href="details.html?type=${type}&id=${item.id}">
+          <a class="btn-secondary" href="details.html?type=${type}&id=${item.id}">
             ${ICONS.info} More Info
           </a>
         </div>

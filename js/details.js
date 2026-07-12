@@ -30,10 +30,8 @@
       }
     });
 
-    // Playlist button (hero + new "My List" button both toggle)
+    // Playlist button
     document.getElementById("playlist-btn").addEventListener("click", togglePlaylistHandler);
-    const saveBtn = document.getElementById("details-save-btn");
-    if (saveBtn) saveBtn.addEventListener("click", togglePlaylistHandler);
 
     await loadDetails();
     // Delay trailer fetch by 2s so primary content paints first
@@ -55,10 +53,11 @@
     renderSimilar(data.similar);
     updatePlaylistButton();
     attachRowArrows();
+    
   }
 
   function renderDetails(data) {
-    // Backdrop (with premium fade-in)
+    // Backdrop
     const hero = document.getElementById("details-hero");
     const skeleton = document.getElementById("hero-skeleton");
     if (data.backdrop_path) {
@@ -66,7 +65,6 @@
       img.src = backdropUrl(data.backdrop_path);
       img.alt = getTitle(data);
       img.onload = () => {
-        img.classList.add("loaded");
         skeleton.style.display = "none";
       };
       hero.insertBefore(img, hero.firstChild);
@@ -75,69 +73,37 @@
       hero.innerHTML += `<div class="img-placeholder" style="width:100%;height:100%">No backdrop available</div>`;
     }
 
-    // Title (left-aligned, Netflix pop-up canvas style)
+    // Title
     document.getElementById("details-title").textContent = getTitle(data);
 
-    // Metadata row: TMDB badge • rating • year • age rating • runtime
+    // Metadata
     const metaEl = document.getElementById("details-meta");
     const rating = data.vote_average ? data.vote_average.toFixed(1) : null;
     const runtime = type === "movie"
       ? formatRuntime(data.runtime)
       : `${data.number_of_seasons || 0} Seasons`;
     const releaseDate = formatDate(data.release_date || data.first_air_date);
-    const year = (data.release_date || data.first_air_date || "").slice(0, 4);
-    const ageRating = getAgeRating(data);
 
     let metaHtml = `<span class="tmdb-badge">TMDB</span>`;
     if (rating) metaHtml += `<span class="meta-rating">★ ${rating}</span><span class="meta-sep">•</span>`;
-    if (year)   metaHtml += `<span>${year}</span>`;
-    if (ageRating) metaHtml += `<span class="meta-sep">•</span><span class="age-rating-badge">${ageRating}</span>`;
-    metaHtml += `<span class="meta-sep">•</span><span>${runtime}</span>`;
+    metaHtml += `<span>${runtime}</span><span class="meta-sep">•</span>`;
+    metaHtml += `<span>${releaseDate}</span>`;
     metaEl.innerHTML = metaHtml;
 
-    // Right column: Cast summary
-    const castSummaryEl = document.getElementById("details-cast-summary");
-    if (data.credits && data.credits.cast && data.credits.cast.length) {
-      const top = data.credits.cast.slice(0, 3).map(c => c.name).join(", ");
-      castSummaryEl.textContent = top + (data.credits.cast.length > 3 ? ", more" : "");
-    } else {
-      castSummaryEl.textContent = "N/A";
-    }
-
-    // Right column: Genres summary
-    const genresSummaryEl = document.getElementById("details-genres-summary");
+    // Genres
+    const genresEl = document.getElementById("details-genres");
     if (data.genres && data.genres.length) {
-      genresSummaryEl.textContent = data.genres.map(g => g.name).join(", ");
-    } else {
-      genresSummaryEl.textContent = "N/A";
+      genresEl.innerHTML = data.genres
+        .map((g) => renderChip(g.name, {}))
+        .join("");
     }
 
-    // Right column: "This movie is:" mood tags — combine genres + keywords
-    const moodSummaryEl = document.getElementById("details-mood-summary");
-    const moodTags = [];
-    if (data.genres && data.genres.length) {
-      data.genres.slice(0, 2).forEach(g => moodTags.push(g.name));
-    }
-    if (data.keywords && data.keywords.keywords && data.keywords.keywords.length) {
-      data.keywords.keywords.slice(0, 3).forEach(k => moodTags.push(k.name));
-    }
-    moodSummaryEl.innerHTML = moodTags.length
-      ? moodTags.map(t => `<span class="mood-tag">${escapeHtml(t)}</span>`).join(" ")
-      : "N/A";
-
-    // Watch Now button (Netflix Play button style)
+    // Watch Now button
     const watchBtn = document.getElementById("watch-now-btn");
     const season = data.number_of_seasons ? 1 : "";
     const episode = data.number_of_episodes ? 1 : "";
     const tvParams = type === "tv" ? `&season=${season}&episode=${episode}` : "";
     watchBtn.href = `watch.html?type=${type}&id=${id}${tvParams}`;
-
-    // ── Anime badge ── Surface a "Sub / Dub available via AniList"
-    // pill on the details page so users know the watch page supports
-    // dub switching. Mirrors the isAnime() logic in watch.js but is
-    // self-contained so the details page doesn't need to load anilist.js.
-    const animeBadge = document.getElementById("details-anime-badge");
-    if (animeBadge) animeBadge.hidden = !isAnimeInline(data);
 
     // Tagline
     const taglineEl = document.getElementById("details-tagline");
@@ -149,79 +115,8 @@
     document.getElementById("details-overview").textContent =
       data.overview || "No overview available.";
 
-    // Information list (full breakdown — still rendered below)
+    // Information list
     renderInfoList(data);
-  }
-
-  /* ── Age rating helper ──
-     Derives a Netflix-style age rating (e.g. 13+, 18+) from
-     TMDB release_dates / content_ratings. Falls back to "NR"
-     (Not Rated) if no usable rating is found. */
-  function getAgeRating(data) {
-    try {
-      // Movies: release_dates.results[].release_dates[].certification
-      if (type === "movie" && data.release_dates && data.release_dates.results) {
-        const us = data.release_dates.results.find(r => r.iso_3166_1 === "US")
-          || data.release_dates.results[0];
-        if (us && us.release_dates && us.release_dates.length) {
-          const cert = us.release_dates[0].certification;
-          if (cert) return normalizeAgeRating(cert);
-        }
-      }
-      // TV: content_ratings.results[].rating
-      if (type === "tv" && data.content_ratings && data.content_ratings.results) {
-        const us = data.content_ratings.results.find(r => r.iso_3166_1 === "US")
-          || data.content_ratings.results[0];
-        if (us && us.rating) return normalizeAgeRating(us.rating);
-      }
-    } catch (e) { /* ignore */ }
-    return "";
-  }
-
-  /* Map raw MPAA/TV certificates to a clean "NN+" badge. */
-  function normalizeAgeRating(cert) {
-    if (!cert) return "";
-    const c = String(cert).trim().toUpperCase();
-    // Common MPAA / TV ratings
-    const map = {
-      "G":      "G",
-      "PG":     "PG",
-      "PG-13":  "13+",
-      "R":      "16+",
-      "NC-17":  "18+",
-      "TV-Y":   "0+",
-      "TV-Y7":  "7+",
-      "TV-Y7-FV":"7+",
-      "TV-G":   "G",
-      "TV-PG":  "PG",
-      "TV-14":  "13+",
-      "TV-MA":  "18+",
-    };
-    return map[c] || ( /^\d+$/.test(c) ? c + "+" : c );
-  }
-
-  /* ── Inline anime detection ──
-     Mirrors the isAnime() helper in watch.js so the details page
-     can surface the "Anime · Sub/Dub via AniList" badge without
-     loading anilist.js. The watch page does the full provider
-     routing; here we just need a yes/no. */
-  function isAnimeInline(data) {
-    if (!data) return false;
-    const ANIME_GENRE_IDS = new Set([16]);
-    const ANIME_KEYWORDS  = ["anime","otaku","shounen","shoujo","isekai","mecha"];
-    const isJa = (data.original_language || "").toLowerCase() === "ja";
-    const hasAnimGenre = (data.genres || []).some(g => ANIME_GENRE_IDS.has(g.id));
-    if (isJa && hasAnimGenre) return true;
-    const fromJapan = (data.production_countries || []).some(c =>
-      (c.iso_3166_1 || "").toUpperCase() === "JP" ||
-      (c.name || "").toLowerCase().includes("japan"));
-    if (fromJapan && hasAnimGenre) return true;
-    const kws = (data.keywords && data.keywords.keywords) || [];
-    if (kws.length && kws.some(k => ANIME_KEYWORDS.some(term =>
-      (k.name || "").toLowerCase().includes(term)))) return true;
-    if (data.first_air_date && hasAnimGenre &&
-        (data.episode_run_time || []).some(t => t && t <= 30)) return true;
-    return false;
   }
 
   async function renderEpisodes(data) {
@@ -419,6 +314,7 @@
     const cast = credits.cast.slice(0, 15);
     row.innerHTML = renderAvatarRow(cast);
     attachRowArrows();
+    
   }
 
   function renderSimilar(similar) {
@@ -432,6 +328,7 @@
       .map((i) => renderPosterCard(i, { type }))
       .join("");
     attachRowArrows();
+    
   }
 
   /* ── Playlist toggle ── */
@@ -450,26 +347,13 @@
   }
 
   function updatePlaylistButton(saved) {
-    const isSaved = saved !== undefined ? saved : isInPlaylist(id, type);
-
-    // Hero playlist button (top-right of backdrop)
     const btn = document.getElementById("playlist-btn");
-    if (btn) {
-      btn.classList.toggle("saved", isSaved);
-      btn.querySelector("svg").innerHTML = isSaved
-        ? '<path d="M6 3h12v18l-6-4-6 4z" fill="currentColor" stroke="currentColor"/>'
-        : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
-      btn.setAttribute("aria-label", isSaved ? "Remove from playlist" : "Add to playlist");
-    }
-
-    // Bottom "My List" button (action row)
-    const saveBtn = document.getElementById("details-save-btn");
-    if (saveBtn) {
-      saveBtn.classList.toggle("saved", isSaved);
-      const label = saveBtn.querySelector("span");
-      if (label) label.textContent = isSaved ? "Saved" : "My List";
-      saveBtn.setAttribute("aria-label", isSaved ? "Remove from playlist" : "Add to playlist");
-    }
+    const isSaved = saved !== undefined ? saved : isInPlaylist(id, type);
+    btn.classList.toggle("saved", isSaved);
+    btn.querySelector("svg").innerHTML = isSaved
+      ? '<path d="M6 3h12v18l-6-4-6 4z" fill="currentColor" stroke="currentColor"/>'
+      : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
+    btn.setAttribute("aria-label", isSaved ? "Remove from playlist" : "Add to playlist");
   }
 
   /* ════════════════════════════════════════════════════════════
