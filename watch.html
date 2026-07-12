@@ -165,17 +165,23 @@
 
   <!-- ═══════════════════════════════════════
        FULLSCREEN PLAYER OVERLAY
-       Iframe attributes tuned for PWA / standalone:
-         • referrerpolicy="no-referrer"  → embed provider can't
-           reject based on parent origin (the #1 cause of "iframe
-           works in browser but blank in installed PWA").
-         • sandbox with explicit permissions → MIUI / iOS WKWebView
-           standalone applies stricter sandboxing than the regular
-           browser tab; listing them explicitly keeps scripts,
-           popups, presentation and same-origin working.
-         • allow (Permissions Policy) → covers everything Cinezo /
-           VidBolt / VidSrc / 2Embed players need to autoplay and
-           enter fullscreen.
+       Iframe is left COMPLETELY UNRESTRICTED — no sandbox, no
+       referrerpolicy override. Embed providers (Cinezo, VidSrc,
+       2Embed, vsembed, etc.) gatekeep their videos when they
+       detect any kind of parent-side restriction or referrer
+       manipulation; the only reliable way to keep them streaming
+       is to send a plain, browser-default iframe request.
+
+       Trade-off: in some installed-PWA WebViews (notably MIUI /
+       iOS standalone) the iframe may be blank because the
+       provider refuses the request. That's the provider's
+       choice — we don't try to work around it. The fallback UI
+       below (Retry / Switch Server / Open in Browser) gives the
+       user an escape hatch when that happens.
+
+       The `allow` attribute is kept because it only GRANTS
+       permissions (autoplay, fullscreen, etc.) — it never
+       restricts. Removing it would break autoplay.
   ═══════════════════════════════════════ -->
   <div class="player-overlay" id="player-overlay">
     <!-- Loading state shown while iframe loads -->
@@ -189,8 +195,10 @@
       <div class="iframe-loader-tip" id="iframe-loader-tip">Starting stream…</div>
 
       <!-- Fallback actions — revealed by watch.js when the iframe
-           fails to fire its `load` event within IFRAME_TIMEOUT_MS,
-           or when an anime title is auto-routed away from Cinezo. -->
+           fails to fire its `load` event within IFRAME_TIMEOUT_MS.
+           These don't touch the iframe itself; they just give the
+           user an escape hatch if the provider gatekeeps the
+           request (common in installed-PWA WebViews). -->
       <div class="iframe-loader-fallback" id="iframe-loader-fallback" hidden>
         <button class="iframe-fallback-btn primary" id="iframe-retry-btn" type="button">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -213,8 +221,6 @@
       src=""
       allowfullscreen
       allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write; screen-wake-lock; gamepad; web-share; display-capture"
-      referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-pointer-lock allow-modals allow-downloads"
     ></iframe>
 
     <!-- Controls -->
