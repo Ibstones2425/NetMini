@@ -283,7 +283,12 @@
     });
     if (elIframeOpenExternalBtn) elIframeOpenExternalBtn.addEventListener('click', () => {
       if (lastEmbedUrl) {
-        window.open(lastEmbedUrl, '_system', 'noopener,noreferrer');
+        // Open in the system browser with no restrictions on the
+        // request itself. `noopener` is kept as a security measure
+        // (prevents the opened page from accessing window.opener),
+        // but `noreferrer` is intentionally NOT set so the provider
+        // sees a normal referrer and doesn't gatekeep the stream.
+        window.open(lastEmbedUrl, '_system', 'noopener');
       }
     });
 
