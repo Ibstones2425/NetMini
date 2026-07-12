@@ -2,12 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>netMini — Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NetMini — Details</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#141414">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NetMini">
+  <link rel="icon" type="image/png" href="favicon-32.png">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/playlink-guide.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/details.css">
   <script src="js/splash.js" defer></script>
+  <script src="js/playlink-guide.js" defer></script>
+  <script src="js/pwa.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -15,7 +25,7 @@
 
     <main class="main-content">
       <div class="page-inner details-page-inner">
-        <!-- Backdrop hero -->
+        <!-- Backdrop hero (Netflix pop-up canvas backdrop) -->
         <div class="details-hero" id="details-hero">
           <button class="details-back-btn" id="back-btn" aria-label="Go back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -26,29 +36,71 @@
           <div class="details-hero-skeleton skeleton" id="hero-skeleton"></div>
         </div>
 
-        <!-- Title -->
-        <h1 class="details-title" id="details-title">Loading...</h1>
+        <!-- ═══════════════════════════════════════════════════
+             NETFLIX POP-UP CANVAS LAYOUT
+             Two-column split on desktop:
+               LEFT  → Title, meta row (year • age rating • runtime),
+                       Play button, tagline, full-paragraph synopsis.
+               RIGHT → "Cast:", "Genres:", "This movie is:" stacked
+                       vertically with muted #B3B3B3 labels.
+             On mobile the columns stack (left first, then right).
+             ═══════════════════════════════════════════════════ -->
+        <div class="details-canvas">
 
-        <!-- Metadata row -->
-        <div class="details-meta" id="details-meta"></div>
+          <!-- LEFT column: title + meta + synopsis -->
+          <div class="details-canvas-left">
+            <h1 class="details-title nf-title" id="details-title">Loading...</h1>
 
-        <!-- Genres -->
-        <div class="details-genres" id="details-genres"></div>
+            <div class="details-meta" id="details-meta"></div>
 
-        <!-- Watch Now button -->
-        <a class="btn-primary details-watch-btn" id="watch-now-btn" href="#">
-          <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-          Watch Now
-        </a>
+            <div class="details-action-row">
+              <a class="btn-play-nf details-watch-btn" id="watch-now-btn" href="#">
+                <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                Play
+              </a>
+              <button class="details-save-btn" id="details-save-btn" aria-label="Save to playlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>My List</span>
+              </button>
+            </div>
 
-        <!-- Tagline -->
-        <p class="details-tagline" id="details-tagline"></p>
+            <!-- Anime badge — surfaced by details.js when isAnime(data)
+                 is true. Tells the user that Sub/Dub is available on
+                 the watch page. -->
+            <div class="details-anime-badge" id="details-anime-badge" hidden>
+              <span class="anime-badge-icon">🌸</span>
+              <span class="anime-badge-text">
+                <strong>Anime</strong> · Sub / Dub available via AniList
+              </span>
+            </div>
 
-        <!-- Overview -->
-        <div class="details-overview-section">
-          <h3 class="details-section-title">Overview</h3>
-          <p id="details-overview" class="details-overview-text">Loading...</p>
-        </div>
+            <p class="details-tagline" id="details-tagline"></p>
+
+            <div class="details-overview-section">
+              <h3 class="details-section-title">Overview</h3>
+              <p id="details-overview" class="details-overview-text">Loading...</p>
+            </div>
+          </div>
+
+          <!-- RIGHT column: Cast / Genres / "This movie is:" -->
+          <aside class="details-canvas-right">
+            <div class="details-fact-block">
+              <div class="details-fact-label">Cast:</div>
+              <div class="details-fact-value" id="details-cast-summary">N/A</div>
+            </div>
+
+            <div class="details-fact-block">
+              <div class="details-fact-label">Genres:</div>
+              <div class="details-fact-value" id="details-genres-summary">N/A</div>
+            </div>
+
+            <div class="details-fact-block">
+              <div class="details-fact-label">This movie is:</div>
+              <div class="details-fact-value" id="details-mood-summary">N/A</div>
+            </div>
+          </aside>
+
+        </div><!-- /details-canvas -->
 
         <!-- Episodes -->
         <section class="details-episodes-section" id="details-episodes-section" hidden>

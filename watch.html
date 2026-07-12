@@ -2,12 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NetMini — Watch</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#141414">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NetMini">
+  <link rel="icon" type="image/png" href="favicon-32.png">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/playlink-guide.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/watch.css">
   <script src="js/splash.js" defer></script>
+  <script src="js/playlink-guide.js" defer></script>
+  <script src="js/pwa.js" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -38,7 +48,7 @@
         <!-- Active server badge on hero -->
         <div class="watch-hero-server-badge" id="watch-hero-server-badge">
           <span class="server-badge-dot"></span>
-          <span id="watch-hero-server-label">Cinezo</span>
+          <span id="watch-hero-server-label">VSEMbed</span>
         </div>
       </div>
 
@@ -64,7 +74,7 @@
           <span class="watch-meta-hd">HD</span>
           <button class="watch-server-chip" id="watch-server-chip" aria-label="Change server">
             <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/><circle cx="7" cy="6.5" r="1" fill="currentColor"/><circle cx="7" cy="15.5" r="1" fill="currentColor"/></svg>
-            <span id="watch-server-name">Cinezo</span>
+            <span id="watch-server-name">VSEMbed</span>
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </div>
@@ -80,6 +90,26 @@
             Switch Server
           </button>
         </div>
+
+        <!-- ═══════════════════════════════════════
+             ANIME SUB / DUB TOGGLE
+             Visible only when isAnime(detailsData) is true.
+             watch.js calls showDubSubToggle(true) on load.
+             Cinezo's anime endpoint honors ?dub=true — the
+             toggle re-builds the embed URL on every change.
+             ═══════════════════════════════════════ -->
+        <div class="dubsub-toggle" id="dubsub-toggle" hidden>
+          <span class="dubsub-label">Audio:</span>
+          <div class="dubsub-pill-group" role="group" aria-label="Audio language">
+            <button type="button" class="dubsub-pill active" id="dubsub-sub" aria-pressed="true">Sub</button>
+            <button type="button" class="dubsub-pill" id="dubsub-dub" aria-pressed="false">Dub</button>
+          </div>
+          <span class="dubsub-hint">via AniList</span>
+        </div>
+
+        <!-- AniList ID lookup status (shown when Cinezo Anime
+             is resolving the AniList ID before play) -->
+        <div class="anilist-lookup-status" id="anilist-lookup-status" hidden></div>
 
         <!-- TV Season/Episode selector -->
         <div class="watch-episode-selector" id="watch-selector" hidden>
@@ -137,6 +167,23 @@
 
   <!-- ═══════════════════════════════════════
        FULLSCREEN PLAYER OVERLAY
+       Iframe is left COMPLETELY UNRESTRICTED — no sandbox, no
+       referrerpolicy override. Embed providers (Cinezo, VidSrc,
+       2Embed, vsembed, etc.) gatekeep their videos when they
+       detect any kind of parent-side restriction or referrer
+       manipulation; the only reliable way to keep them streaming
+       is to send a plain, browser-default iframe request.
+
+       Trade-off: in some installed-PWA WebViews (notably MIUI /
+       iOS standalone) the iframe may be blank because the
+       provider refuses the request. That's the provider's
+       choice — we don't try to work around it. The fallback UI
+       below (Retry / Switch Server / Open in Browser) gives the
+       user an escape hatch when that happens.
+
+       The `allow` attribute is kept because it only GRANTS
+       permissions (autoplay, fullscreen, etc.) — it never
+       restricts. Removing it would break autoplay.
   ═══════════════════════════════════════ -->
   <div class="player-overlay" id="player-overlay">
     <!-- Loading state shown while iframe loads -->
@@ -148,6 +195,26 @@
       </div>
       <div class="iframe-loader-logo">NET<span>MINI</span></div>
       <div class="iframe-loader-tip" id="iframe-loader-tip">Starting stream…</div>
+
+      <!-- Fallback actions — revealed by watch.js when the iframe
+           fails to fire its `load` event within IFRAME_TIMEOUT_MS.
+           These don't touch the iframe itself; they just give the
+           user an escape hatch if the provider gatekeeps the
+           request (common in installed-PWA WebViews). -->
+      <div class="iframe-loader-fallback" id="iframe-loader-fallback" hidden>
+        <button class="iframe-fallback-btn primary" id="iframe-retry-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Retry
+        </button>
+        <button class="iframe-fallback-btn" id="iframe-switch-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/></svg>
+          Switch Server
+        </button>
+        <button class="iframe-fallback-btn" id="iframe-open-external-btn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open in Browser
+        </button>
+      </div>
     </div>
 
     <iframe
@@ -155,8 +222,7 @@
       id="player-overlay-iframe"
       src=""
       allowfullscreen
-      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write"
-      referrerpolicy="no-referrer-when-downgrade"
+      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; gyroscope; accelerometer; clipboard-write; screen-wake-lock; gamepad; web-share; display-capture"
     ></iframe>
 
     <!-- Controls -->
@@ -166,7 +232,7 @@
       </button>
       <button class="player-overlay-server-btn" id="player-server-switch" aria-label="Switch server">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="13" width="18" height="5" rx="1"/></svg>
-        <span id="player-active-server">Cinezo</span>
+        <span id="player-active-server">VSEMbed</span>
       </button>
     </div>
   </div>
