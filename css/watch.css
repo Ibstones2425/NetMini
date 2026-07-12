@@ -553,3 +553,130 @@ body.player-open { overflow: hidden; }
   background: rgba(70,211,105,0.12); border: 1px solid rgba(70,211,105,0.3);
   border-radius: 99px; padding: 2px 8px; white-space: nowrap; flex-shrink: 0;
 }
+
+/* ============================================================
+   ANIME "IN DEVELOPMENT" BANNER + MODAL
+   Surfaced when a user lands on an anime title.
+   ============================================================ */
+
+.anime-dev-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
+  border: 1px solid rgba(229,9,20,0.35);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  margin: 14px 0;
+}
+
+.anime-dev-banner .anime-dev-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(229,9,20,0.15);
+  color: var(--color-accent);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.anime-dev-banner .anime-dev-text {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.anime-dev-banner .anime-dev-text strong {
+  color: #fff; font-size: 0.88rem; font-weight: 700;
+}
+.anime-dev-banner .anime-dev-text span {
+  color: var(--color-text-secondary); font-size: 0.78rem;
+}
+
+/* ── Modal overlay ── */
+.anime-dev-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.anime-dev-modal-overlay.open {
+  opacity: 1; pointer-events: auto;
+}
+
+.anime-dev-modal-card {
+  position: relative;
+  background: var(--color-bg-3);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: 32px 24px 24px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-modal);
+  transform: translateY(12px);
+  transition: transform 0.25s ease;
+}
+.anime-dev-modal-overlay.open .anime-dev-modal-card {
+  transform: translateY(0);
+}
+
+.anime-dev-modal-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-4);
+  color: var(--color-text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.anime-dev-modal-close:hover { background: var(--color-bg-4); color: #fff; }
+
+.anime-dev-modal-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: rgba(229,9,20,0.12);
+  color: var(--color-accent);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.anime-dev-modal-title {
+  font-size: 1.15rem; font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.anime-dev-modal-body {
+  font-size: 0.86rem; color: var(--color-text-secondary);
+  line-height: 1.55; margin-bottom: 10px;
+}
+
+.anime-dev-modal-sub {
+  font-size: 0.78rem; color: var(--color-text-muted);
+  line-height: 1.5; margin-bottom: 18px;
+}
+
+.anime-dev-modal-actions {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.anime-dev-modal-btn {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-4);
+  color: #fff;
+  font-size: 0.86rem; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  border: none;
+}
+.anime-dev-modal-btn:hover { background: var(--color-bg-4); }
+.anime-dev-modal-btn:active { transform: scale(0.98); }
+
+.anime-dev-modal-btn.primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+.anime-dev-modal-btn.primary:hover { background: var(--color-accent-hover); }
